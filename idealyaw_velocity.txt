@@ -1,0 +1,158 @@
+local images = require "gamesense/images"
+
+local warning = images.load_svg([[
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="360px" height="321px" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g><path style="opacity:0.542" fill="#06040b" d="M 172.5,3.5 C 190.953,2.3096 205.453,9.3096 216,24.5C 257.667,96.5 299.333,168.5 341,240.5C 348.222,251.825 351.555,264.159 351,277.5C 347.84,294.329 338.007,305.163 321.5,310C 316.877,310.958 312.21,311.625 307.5,312C 222.167,312.667 136.833,312.667 51.5,312C 17.9834,308.505 4.48344,290.338 11,257.5C 12.2215,253.29 13.8882,249.29 16,245.5C 57.586,173.997 98.9193,102.33 140,30.5C 147.451,17.1972 158.285,8.19716 172.5,3.5 Z"/></g>
+<g><path style="opacity:1" fill="#201c1e" d="M 173.5,5.5 C 184.129,4.40695 193.796,6.90695 202.5,13C 206.682,17.015 210.682,21.1817 214.5,25.5C 256.226,97.7859 298.06,170.119 340,242.5C 346.724,253.902 349.891,266.068 349.5,279C 343.923,297.815 331.256,308.148 311.5,310C 223.5,310.667 135.5,310.667 47.5,310C 16.0153,303.874 4.8486,285.374 14,254.5C 56.7472,179.337 99.7472,104.337 143,29.5C 150.175,17.4696 160.342,9.46956 173.5,5.5 Z"/></g>
+<g><path style="opacity:1" fill="#f0b822" d="M 142.5,41.5 C 143.525,41.8966 143.692,42.5632 143,43.5C 101.828,113.84 61.1612,184.507 21,255.5C 15.4088,268.926 16.5754,281.592 24.5,293.5C 18.6934,288.041 15.6934,281.207 15.5,273C 15.9007,265.465 17.7341,258.298 21,251.5C 61.2742,181.274 101.774,111.274 142.5,41.5 Z"/></g>
+<g><path style="opacity:1" fill="#fbb520" d="M 24.5,293.5 C 16.5754,281.592 15.4088,268.926 21,255.5C 61.1612,184.507 101.828,113.84 143,43.5C 143.692,42.5632 143.525,41.8966 142.5,41.5C 147.888,27.9451 157.221,18.1117 170.5,12C 184.573,8.80187 196.406,12.6352 206,23.5C 209.247,27.6591 212.247,31.9924 215,36.5C 255,105.833 295,175.167 335,244.5C 343.395,256.875 345.729,270.209 342,284.5C 335.445,297.205 324.945,304.039 310.5,305C 223.5,305.667 136.5,305.667 49.5,305C 39.5664,304.363 31.2331,300.529 24.5,293.5 Z"/></g>
+<g><path style="opacity:1" fill="#211c1e" d="M 113.5,125.5 C 126.244,123.594 133.577,128.928 135.5,141.5C 133.59,154.232 126.256,159.398 113.5,157C 102.703,150.943 100.203,142.443 106,131.5C 108.114,128.879 110.614,126.879 113.5,125.5 Z"/></g>
+<g><path style="opacity:1" fill="#211c1e" d="M 156.5,95.5 C 160.639,94.7042 163.805,96.0375 166,99.5C 166.667,114.833 166.667,130.167 166,145.5C 162.466,150.031 158.632,154.197 154.5,158C 155.936,166.771 160.936,172.438 169.5,175C 178.41,177.788 187.41,178.121 196.5,176C 206.037,172.535 215.704,169.868 225.5,168C 236.304,177.803 246.804,187.97 257,198.5C 258.171,207 254.671,210.166 246.5,208C 238.258,199.255 229.592,191.088 220.5,183.5C 212.53,186.101 204.53,188.601 196.5,191C 194.781,192.87 193.781,195.037 193.5,197.5C 205.245,201.36 216.912,205.527 228.5,210C 238.333,219.833 248.167,229.667 258,239.5C 259.762,248.744 256.262,251.91 247.5,249C 238.47,239.636 229.137,230.636 219.5,222C 208.833,218 198.167,214 187.5,210C 172.057,209.873 157.39,206.54 143.5,200C 136.124,193.971 130.291,186.804 126,178.5C 121.978,182.023 117.811,185.357 113.5,188.5C 112.667,201.487 112.167,214.487 112,227.5C 107.667,232.833 103.333,232.833 99,227.5C 98.3333,212.833 98.3333,198.167 99,183.5C 103.651,178.57 108.484,173.736 113.5,169C 126.066,159.134 138.899,149.634 152,140.5C 152.333,126.833 152.667,113.167 153,99.5C 153.69,97.6498 154.856,96.3164 156.5,95.5 Z"/></g>
+<g><path style="opacity:1" fill="#1d1a1e" d="M 154.5,80.5 C 163.762,78.4392 171.262,81.1059 177,88.5C 178.59,90.6498 179.257,92.9832 179,95.5C 174.055,83.1111 165.222,78.9444 152.5,83C 147.786,85.0512 143.619,87.8845 140,91.5C 139.837,89.6133 140.671,88.1133 142.5,87C 146.434,84.5361 150.434,82.3694 154.5,80.5 Z"/></g>
+<g><path style="opacity:1" fill="#201d1f" d="M 156.5,86.5 C 164.086,85.8604 169.253,88.8604 172,95.5C 163.667,86.1667 155.333,86.1667 147,95.5C 148.631,91.039 151.798,88.039 156.5,86.5 Z"/></g>
+<g><path style="opacity:1" fill="#211d1f" d="M 285.5,222.5 C 289.651,223.486 290.484,225.82 288,229.5C 282.221,234.797 275.721,238.63 268.5,241C 274.741,235.263 280.408,229.097 285.5,222.5 Z"/></g>
+<g><path style="opacity:1" fill="#1f1b1d" d="M 309.5,224.5 C 311.527,224.338 313.527,224.505 315.5,225C 316.447,228.791 315.114,231.791 311.5,234C 303.627,236.574 295.627,238.241 287.5,239C 295.009,234.304 302.343,229.47 309.5,224.5 Z"/></g>
+<g><path style="opacity:1" fill="#231f21" d="M 92.5,231.5 C 92.56,230.957 92.8933,230.624 93.5,230.5C 99.093,236.179 105.76,238.012 113.5,236C 105.568,239.437 98.5677,237.937 92.5,231.5 Z"/></g>
+<g><path style="opacity:1" fill="#201d20" d="M 84.5,229.5 C 88.6353,238.503 95.802,243.17 106,243.5C 110.973,242.903 115.806,242.069 120.5,241C 110.337,245.893 100.337,245.56 90.5,240C 87.0661,237.297 85.0661,233.797 84.5,229.5 Z"/></g>
+<g><path style="opacity:1" fill="#1c191c" d="M 291.5,249.5 C 285.974,249.821 280.64,249.488 275.5,248.5C 283.061,246.091 290.728,244.091 298.5,242.5C 300.167,242.667 301.833,242.833 303.5,243C 304.517,244.049 304.684,245.216 304,246.5C 300.199,248.926 296.032,249.926 291.5,249.5 Z"/></g>
+<g><path style="opacity:1" fill="#a27a23" d="M 275.5,248.5 C 280.64,249.488 285.974,249.821 291.5,249.5C 285.987,250.816 280.32,250.816 274.5,249.5C 274.624,248.893 274.957,248.56 275.5,248.5 Z"/></g>
+<g><path style="opacity:1" fill="#1a181c" d="M 232.5,247.5 C 233.773,248.077 233.773,248.743 232.5,249.5C 220.271,255.974 207.271,259.141 193.5,259C 201.984,258.086 210.317,256.419 218.5,254C 223.618,252.605 228.285,250.438 232.5,247.5 Z"/></g>
+<g><path style="opacity:1" fill="#231f21" d="M 243.5,250.5 C 244.773,251.077 244.773,251.743 243.5,252.5C 239.237,256.048 234.404,258.382 229,259.5C 228.5,259 228,258.5 227.5,258C 233.807,257.344 239.141,254.844 243.5,250.5 Z"/></g>
+<g><path style="opacity:1" fill="#fec620" d="M 193.5,260.5 C 234.82,261.293 276.153,261.793 317.5,262C 225.167,262.667 132.833,262.667 40.5,262C 91.6683,261.833 142.668,261.333 193.5,260.5 Z"/></g>
+<g><path style="opacity:1" fill="#211c1e" d="M 38.5,263.5 C 132.167,263.333 225.834,263.5 319.5,264C 323.409,266.566 324.409,270.066 322.5,274.5C 321.335,275.584 320.002,276.417 318.5,277C 225.5,277.667 132.5,277.667 39.5,277C 33.1887,272.96 32.8553,268.46 38.5,263.5 Z"/></g>
+</svg>
+ ]])
+
+local w, h = client.screen_size()
+
+local checkboxvelo = ui.new_checkbox("LUA", "A", "velocity")
+local colorvelo = ui.new_color_picker("LUA", "A", "velo color", 255, 255, 255, 255)
+local dragging = {
+    vel_x = ui.new_slider("LUA", "A", "\nX Vel", 0, w, w/2-64),
+    vel_y = ui.new_slider("LUA", "A", "\nY Vel", 0, h, 350),
+}
+
+
+local gradient_ranges = {
+    {from = 0,  to = 20,  color1 = {180, 40, 70},   color2 = {220, 70, 100}},    
+    {from = 20, to = 40,  color1 = {220, 70, 100},  color2 = {240, 120, 100}},    
+    {from = 40, to = 60,  color1 = {240, 120, 100}, color2 = {240, 170, 90}},     
+    {from = 60, to = 80,  color1 = {240, 170, 90},  color2 = {220, 210, 100}},    
+    {from = 80, to = 100, color1 = {220, 210, 100}, color2 = {170, 230, 120}},    
+}
+
+
+
+local function interpolate_color(percent)
+    for _, range in ipairs(gradient_ranges) do
+        if percent >= range.from and percent <= range.to then
+            local delta = (percent - range.from) / (range.to - range.from)
+            local r = math.floor(range.color1[1] + (range.color2[1] - range.color1[1]) * delta)
+            local g = math.floor(range.color1[2] + (range.color2[2] - range.color1[2]) * delta)
+            local b = math.floor(range.color1[3] + (range.color2[3] - range.color1[3]) * delta)
+            return r, g, b
+        end
+    end
+    return 255, 255, 255  -- Default color if out of range
+end
+
+local clamp = function(_, value, minimum, maximum)
+    return math.min(math.max(value, minimum), maximum)
+end
+
+local lerp = function(self, delta, from, to)
+    if from == nil then from = 0 end
+    if delta > 1 then return to end
+    if delta < 0 then return from end
+    return from + (to - from) * delta
+end
+
+local rectangle_outline = function(x, y, w, h, r, g, b, a, s)
+    renderer.rectangle(x, y, w, s, r, g, b, a)
+    renderer.rectangle(x, y+h-s, w, s, r, g, b, a)
+    renderer.rectangle(x, y+s, s, h-s*2, r, g, b, a)
+    renderer.rectangle(x+w-s, y+s, s, h-s*2, r, g, b, a)
+end
+
+local smooth_lerp = function(self, time, s, e, no_rounding) 
+    if (math.abs(s - e) < 1 or s == e) and not no_rounding then return e end
+    local time = self:clamp(globals_frametime() * time * 165, 0.01, 1.0) 
+    local value = self:lerp(time, s, e)
+    return value 
+end
+
+local rounded_rectangle = function(x, y, w, h, r, g, b, a, radius, side)
+    y = y + radius
+    local data_circle = {
+        {x + radius, y, 180},
+        side and {} or {x + w - radius, y, 90},
+        {x + radius, y + h - radius * 2, 270},
+        side and {} or {x + w - radius, y + h - radius * 2, 0},
+    }
+
+    local data = {
+        {x + radius, y, w - radius * 2, h - radius * 2},
+        {x + radius, y - radius, w - radius * 2, radius},
+        {x + radius, y + h - radius * 2, w - radius * 2, radius},
+        {x, y, radius, h - radius * 2},
+        side and {} or {x + w - radius, y, radius, h - radius * 2},
+    }
+
+    for _, data in next, data_circle do
+        if data ~= nil then
+            renderer.circle(data[1], data[2], r, g, b, a, radius, data[3], 0.25)
+        end
+    end
+
+    for _, data in next, data do
+        if data ~= nil then
+            renderer.rectangle(data[1], data[2], data[3], data[4], r, g, b, a)
+        end
+    end
+end
+
+local draw_velocity = function(modifier, r, g, b, alpha, x, y)	
+    local text_width = renderer.measure_text(nil, ("%s %d%%"):format("Velocity ", modifier*100))
+    local iw, ih = warning:measure(nil, 17)
+    local rx, ry, rw, rh = x + iw + 30, y + 24, 140, 13
+
+
+
+
+
+
+    warning:draw(x - 7, y - 7, nil, 43, 255, 255, 255, 255)
+
+    renderer.text(rx + 1, y + 8, 255, 255, 255, 255, "b", 0, ("%s %d%%"):format("VELOCITY ", modifier * 100))
+
+
+rounded_rectangle(rx + 2, ry, rw - 2, rh, 16, 16, 16, 180, 4)
+
+
+rounded_rectangle(rx + 2, ry, math.floor((rw - 3) * modifier), rh, r, g, b, 210, 4)
+
+return iw + rw + 20
+
+end
+
+local velocity_warning = function()
+    if not ui.get(checkboxvelo) then return end
+    local ent = entity.get_local_player()
+    local modifier = entity.get_prop(ent, "m_flVelocityModifier") or 1
+    local velocity_percent = modifier * 100
+    local r, g, b = interpolate_color(velocity_percent)
+    local menu = ui.is_menu_open()
+    local x = ui.get(dragging.vel_x)
+    local y = ui.get(dragging.vel_y)
+    
+    if modifier == 1 or not entity.is_alive(ent) then 
+        if menu then 
+            local w = draw_velocity(0.5, r, g, b, 255, x+3, y+3)
+        end
+        return 
+    end
+    
+    local w = draw_velocity(modifier, r, g, b, 255, x+3, y+3)
+end
+
+client.set_event_callback("paint_ui", velocity_warning)

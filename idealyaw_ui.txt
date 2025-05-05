@@ -1,0 +1,1639 @@
+-- local variables for API functions. any changes to the line below will be lost on re-generation
+local bit_band, bit_lshift, client_color_log, client_create_interface, client_delay_call, client_find_signature, client_key_state, client_reload_active_scripts, client_screen_size, client_set_event_callback, client_system_time, client_timestamp, client_unset_event_callback, database_read, database_write, entity_get_classname, entity_get_local_player, entity_get_origin, entity_get_player_name, entity_get_prop, entity_get_steam64, entity_is_alive, globals_framecount, globals_realtime, math_ceil, math_floor, math_max, math_min, panorama_loadstring, renderer_gradient, renderer_line, renderer_rectangle, table_concat, table_insert, table_remove, table_sort, ui_get, ui_is_menu_open, ui_mouse_position, ui_new_checkbox, ui_new_color_picker, ui_new_combobox, ui_new_slider, ui_set, ui_set_visible, setmetatable, pairs, error, globals_absoluteframetime, globals_curtime, globals_frametime, globals_maxplayers, globals_tickcount, globals_tickinterval, math_abs, type, pcall, renderer_circle_outline, renderer_load_rgba, renderer_measure_text, renderer_text, renderer_texture, tostring, ui_name, ui_new_button, ui_new_hotkey, ui_new_label, ui_new_listbox, ui_new_textbox, ui_reference, ui_set_callback, ui_update, unpack, tonumber = bit.band, bit.lshift, client.color_log, client.create_interface, client.delay_call, client.find_signature, client.key_state, client.reload_active_scripts, client.screen_size, client.set_event_callback, client.system_time, client.timestamp, client.unset_event_callback, database.read, database.write, entity.get_classname, entity.get_local_player, entity.get_origin, entity.get_player_name, entity.get_prop, entity.get_steam64, entity.is_alive, globals.framecount, globals.realtime, math.ceil, math.floor, math.max, math.min, panorama.loadstring, renderer.gradient, renderer.line, renderer.rectangle, table.concat, table.insert, table.remove, table.sort, ui.get, ui.is_menu_open, ui.mouse_position, ui.new_checkbox, ui.new_color_picker, ui.new_combobox, ui.new_slider, ui.set, ui.set_visible, setmetatable, pairs, error, globals.absoluteframetime, globals.curtime, globals.frametime, globals.maxplayers, globals.tickcount, globals.tickinterval, math.abs, type, pcall, renderer.circle_outline, renderer.load_rgba, renderer.measure_text, renderer.text, renderer.texture, tostring, ui.name, ui.new_button, ui.new_hotkey, ui.new_label, ui.new_listbox, ui.new_textbox, ui.reference, ui.set_callback, ui.update, unpack, tonumber
+
+local ffi = require 'ffi'
+local vector = require 'vector'
+local images = require 'gamesense/images'
+local anti_aim = require 'gamesense/antiaim_funcs'
+
+local icon = renderer.load_svg([[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="501px" height="498px" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g><path style="opacity:0.999" fill="#fefefe" d="M 392.5,3.5 C 391.448,3.35055 390.448,3.51722 389.5,4C 391.679,4.44185 392.345,5.44185 391.5,7C 394.353,9.59556 397.686,11.4289 401.5,12.5C 403.167,14.8333 405.167,16.8333 407.5,18.5C 409.268,20.9389 410.601,23.6056 411.5,26.5C 412.672,26.9186 413.672,27.5853 414.5,28.5C 415.439,32.4643 416.272,36.4643 417,40.5C 418.333,41.8333 419.667,43.1667 421,44.5C 422.481,43.5291 423.315,42.1958 423.5,40.5C 424.833,46.1667 424.833,51.8333 423.5,57.5C 423.225,55.1582 422.392,55.1582 421,57.5C 420.667,56.8333 420.333,56.1667 420,55.5C 419.5,56.6667 418.667,57.5 417.5,58C 418.517,59.0495 418.684,60.2161 418,61.5C 416.095,63.4241 414.928,65.7574 414.5,68.5C 413.372,69.2621 412.205,69.9288 411,70.5C 410.644,76.0627 407.811,79.5627 402.5,81C 402.833,81.3333 403.167,81.6667 403.5,82C 401.751,85.5254 399.584,86.0254 397,83.5C 393.623,84.8199 390.123,85.8199 386.5,86.5C 385.208,88.6666 384.375,90.9999 384,93.5C 382.053,112.441 382.219,131.441 384.5,150.5C 383.782,156.84 383.449,163.173 383.5,169.5C 384.484,172.659 386.484,173.659 389.5,172.5C 392.55,174.057 395.717,175.391 399,176.5C 399.667,186.5 399.667,196.5 399,206.5C 398.422,209.847 397.922,213.347 397.5,217C 398.782,221.776 401.116,225.942 404.5,229.5C 403.833,229.833 403.167,230.167 402.5,230.5C 405.131,232.005 404.797,232.671 401.5,232.5C 401.657,233.873 401.49,235.207 401,236.5C 400.667,236.167 400.333,235.833 400,235.5C 399.384,238.787 397.884,241.621 395.5,244C 396.141,247.743 396.141,251.577 395.5,255.5C 396.5,255.5 397.5,255.5 398.5,255.5C 398.939,259.923 398.939,264.256 398.5,268.5C 399.086,273.775 400.086,278.942 401.5,284C 400.806,286.553 399.973,289.053 399,291.5C 398.333,292.833 397.667,292.833 397,291.5C 396.667,292.167 396.333,292.833 396,293.5C 394.667,293.5 393.333,293.5 392,293.5C 391.667,292.833 391.333,292.167 391,291.5C 389,292.833 387,292.833 385,291.5C 383.416,292.861 381.582,293.528 379.5,293.5C 378.625,297.161 378.291,300.661 378.5,304C 378.918,307.35 380.252,310.184 382.5,312.5C 382.287,319.174 381.954,325.841 381.5,332.5C 380.596,333.209 380.263,334.209 380.5,335.5C 379.5,335.5 378.5,335.5 377.5,335.5C 376.352,349.835 376.352,364.168 377.5,378.5C 377.333,381.833 377.167,385.167 377,388.5C 375.539,390.294 375.372,392.294 376.5,394.5C 376.299,398.424 375.799,398.424 375,394.5C 374.919,399.524 375.419,404.524 376.5,409.5C 375.573,416.51 374.573,423.51 373.5,430.5C 374.041,433.208 374.708,435.874 375.5,438.5C 374.185,452.134 374.185,465.8 375.5,479.5C 378.76,480.855 380.427,483.355 380.5,487C 380.801,490.407 380.468,493.907 379.5,497.5C 352.167,497.5 324.833,497.5 297.5,497.5C 296.189,494.878 294.855,492.211 293.5,489.5C 291.898,490.55 291.065,489.883 291,487.5C 290.586,487.957 290.086,488.291 289.5,488.5C 288.526,486.257 288.192,483.924 288.5,481.5C 289.5,481.5 290.5,481.5 291.5,481.5C 291.215,477.975 291.881,474.642 293.5,471.5C 293.392,470.558 293.059,469.725 292.5,469C 294.754,467.946 295.087,466.446 293.5,464.5C 295.611,461.647 295.611,458.981 293.5,456.5C 294.769,452.351 295.435,448.018 295.5,443.5C 295.096,438.656 295.096,433.99 295.5,429.5C 294.605,426.192 293.771,422.859 293,419.5C 291.844,420.993 291.01,420.826 290.5,419C 291.029,417.441 291.696,415.941 292.5,414.5C 291.522,413.199 291.855,412.032 293.5,411C 290.638,406.275 288.305,401.275 286.5,396C 286.318,390.194 286.652,384.528 287.5,379C 287.156,377.635 286.489,376.468 285.5,375.5C 287.062,372.386 286.729,369.553 284.5,367C 285.249,365.266 285.749,363.433 286,361.5C 286.333,362.167 286.667,362.833 287,363.5C 291.057,354.999 292.39,345.999 291,336.5C 289.024,335.572 287.191,334.405 285.5,333C 284.101,332.405 282.768,332.572 281.5,333.5C 279.075,331.855 276.408,330.689 273.5,330C 268.336,324.816 263.836,318.983 260,312.5C 254.64,308.337 250.306,303.337 247,297.5C 246.292,298.381 245.458,299.047 244.5,299.5C 241.969,294.802 238.303,291.302 233.5,289C 233.833,288.667 234.167,288.333 234.5,288C 232.557,288.305 230.557,288.305 228.5,288C 224.877,282.896 220.544,282.23 215.5,286C 218.133,288.913 217.467,290.746 213.5,291.5C 212.399,297.57 210.232,303.237 207,308.5C 205.921,310.394 204.587,310.727 203,309.5C 202.333,311.167 202.333,312.833 203,314.5C 203.893,313.289 204.726,313.289 205.5,314.5C 203.995,315.842 203.328,317.508 203.5,319.5C 202.789,326.298 201.455,332.965 199.5,339.5C 197.086,343.291 193.92,346.291 190,348.5C 189.562,351.376 188.562,354.043 187,356.5C 174.454,366.126 169.788,378.792 173,394.5C 169.453,402.308 165.619,409.975 161.5,417.5C 160.095,422.878 158.595,428.211 157,433.5C 153.71,438.158 149.71,442.158 145,445.5C 139.683,456.741 137.85,468.407 139.5,480.5C 139.343,481.873 139.51,483.207 140,484.5C 140.21,482.942 140.71,481.609 141.5,480.5C 142.167,486.167 142.833,491.833 143.5,497.5C 124.833,497.5 106.167,497.5 87.5,497.5C 87.1758,493.445 87.5091,489.445 88.5,485.5C 91.5461,475.204 94.5461,465.038 97.5,455C 97.0426,454.586 96.7093,454.086 96.5,453.5C 99.4608,446.916 99.9608,440.25 98,433.5C 97.5357,434.094 97.369,434.761 97.5,435.5C 96.596,434.791 96.2627,433.791 96.5,432.5C 96.5905,419.537 100.257,407.704 107.5,397C 108.852,390.873 110.018,384.706 111,378.5C 113.075,374.1 115.408,369.433 118,364.5C 118.333,364.833 118.667,365.167 119,365.5C 122.556,359.43 125.556,353.43 128,347.5C 129.543,345.622 131.376,344.122 133.5,343C 132.577,340.952 133.077,339.119 135,337.5C 135.752,333.163 136.086,328.829 136,324.5C 135.722,325.416 135.222,326.082 134.5,326.5C 134.175,318.981 134.508,311.648 135.5,304.5C 135.336,307.187 135.503,309.854 136,312.5C 136.333,309.5 136.667,306.5 137,303.5C 139.774,301.511 140.774,298.845 140,295.5C 139.237,298.063 138.737,298.063 138.5,295.5C 138.92,291.774 139.92,288.274 141.5,285C 139.875,282.863 140.208,281.197 142.5,280C 142.235,275.128 142.235,269.962 142.5,264.5C 140.536,261.982 139.87,259.316 140.5,256.5C 139.833,255.833 139.167,255.167 138.5,254.5C 140.967,250.935 141.133,247.268 139,243.5C 138.667,243.833 138.333,244.167 138,244.5C 136.904,238.087 137.904,232.087 141,226.5C 142.542,224.696 144.209,223.029 146,221.5C 146.35,212.906 145.85,204.572 144.5,196.5C 144.39,194.626 145.056,193.126 146.5,192C 146.167,191.667 145.833,191.333 145.5,191C 147.968,185.96 150.635,180.96 153.5,176C 153.167,175.667 152.833,175.333 152.5,175C 154.187,173.087 154.687,170.92 154,168.5C 151.929,167.636 150.262,166.303 149,164.5C 148.667,164.833 148.333,165.167 148,165.5C 147.365,164.034 146.531,162.7 145.5,161.5C 146.025,160.808 146.692,160.308 147.5,160C 146.422,159.326 145.755,158.326 145.5,157C 146.123,153.519 146.623,150.019 147,146.5C 148.791,142.589 150.291,138.589 151.5,134.5C 155.71,122.129 162.543,111.463 172,102.5C 173.613,103.622 174.78,103.122 175.5,101C 177.8,100.342 180.133,99.8417 182.5,99.5C 186.008,100.115 189.341,101.115 192.5,102.5C 194.937,102.402 196.937,101.402 198.5,99.5C 201.143,95.0232 204.643,91.3565 209,88.5C 210.841,84.8168 213.174,81.4835 216,78.5C 216.333,78.8333 216.667,79.1667 217,79.5C 217.36,77.3921 218.027,75.3921 219,73.5C 224.159,67.1831 228.826,60.5165 233,53.5C 237.043,53.4656 239.376,51.1323 240,46.5C 242.705,43.9638 245.205,41.2971 247.5,38.5C 251.358,34.5503 255.691,31.0503 260.5,28C 268.951,23.3032 277.951,19.9699 287.5,18C 294.97,16.2134 301.47,17.7134 307,22.5C 309.498,21.4018 311.998,21.5684 314.5,23C 316.853,26.1024 319.519,28.1024 322.5,29C 324.473,29.4955 326.473,29.6621 328.5,29.5C 328.383,27.5165 329.05,25.8498 330.5,24.5C 335.296,20.5352 339.63,16.0352 343.5,11C 347.429,8.21295 351.429,5.71295 355.5,3.5C 367.98,2.23854 380.314,2.23854 392.5,3.5 Z M 355.5,420.5 C 356.888,427.273 356.555,433.939 354.5,440.5C 353.852,442.086 353.352,443.753 353,445.5C 352.554,442.657 352.054,439.824 351.5,437C 352.302,433.596 353.302,430.263 354.5,427C 354.297,424.594 353.297,422.594 351.5,421C 352.793,420.51 354.127,420.343 355.5,420.5 Z"/></g>
+<g><path style="opacity:0.8" fill="#eeedeb" d="M 355.5,3.5 C 351.429,5.71295 347.429,8.21295 343.5,11C 339.63,16.0352 335.296,20.5352 330.5,24.5C 329.05,25.8498 328.383,27.5165 328.5,29.5C 326.473,29.6621 324.473,29.4955 322.5,29C 319.519,28.1024 316.853,26.1024 314.5,23C 311.998,21.5684 309.498,21.4018 307,22.5C 301.47,17.7134 294.97,16.2134 287.5,18C 277.951,19.9699 268.951,23.3032 260.5,28C 255.691,31.0503 251.358,34.5503 247.5,38.5C 247.158,37.6618 246.492,37.3284 245.5,37.5C 262.502,19.9996 283.169,13.1663 307.5,17C 313.96,19.7293 319.96,23.2293 325.5,27.5C 331.284,18.549 338.617,11.049 347.5,5C 350.063,3.92074 352.729,3.42074 355.5,3.5 Z"/></g>
+<g><path style="opacity:0.645" fill="#faf9f1" d="M 392.5,3.5 C 400.47,4.40532 406.97,8.07199 412,14.5C 417.732,22.2998 421.565,30.9664 423.5,40.5C 423.315,42.1958 422.481,43.5291 421,44.5C 419.667,43.1667 418.333,41.8333 417,40.5C 416.272,36.4643 415.439,32.4643 414.5,28.5C 413.672,27.5853 412.672,26.9186 411.5,26.5C 410.601,23.6056 409.268,20.9389 407.5,18.5C 405.167,16.8333 403.167,14.8333 401.5,12.5C 397.686,11.4289 394.353,9.59556 391.5,7C 392.345,5.44185 391.679,4.44185 389.5,4C 390.448,3.51722 391.448,3.35055 392.5,3.5 Z"/></g>
+<g><path style="opacity:0.898" fill="#eeedf1" d="M 245.5,37.5 C 246.492,37.3284 247.158,37.6618 247.5,38.5C 245.205,41.2971 242.705,43.9638 240,46.5C 239.376,51.1323 237.043,53.4656 233,53.5C 228.826,60.5165 224.159,67.1831 219,73.5C 218.027,75.3921 217.36,77.3921 217,79.5C 216.667,79.1667 216.333,78.8333 216,78.5C 213.174,81.4835 210.841,84.8168 209,88.5C 204.643,91.3565 201.143,95.0232 198.5,99.5C 196.937,101.402 194.937,102.402 192.5,102.5C 189.341,101.115 186.008,100.115 182.5,99.5C 180.133,99.8417 177.8,100.342 175.5,101C 174.78,103.122 173.613,103.622 172,102.5C 162.543,111.463 155.71,122.129 151.5,134.5C 149.126,137.949 147.126,141.616 145.5,145.5C 148.867,127.261 157.534,112.094 171.5,100C 179.308,96.7602 186.975,96.7602 194.5,100C 209.098,82.7384 222.931,64.9051 236,46.5C 239.036,43.2956 242.203,40.2956 245.5,37.5 Z"/></g>
+<g><path style="opacity:0.982" fill="#fbfaf4" d="M 423.5,57.5 C 420.556,68.8853 414.89,78.7186 406.5,87C 401.009,90.3728 395.009,91.8728 388.5,91.5C 388.826,100.017 388.493,108.35 387.5,116.5C 387.785,114.712 387.452,113.045 386.5,111.5C 385.334,127.49 385.167,143.49 386,159.5C 386.179,162.553 386.679,165.553 387.5,168.5C 388.298,168.043 388.631,167.376 388.5,166.5C 392.672,168.544 397.005,170.378 401.5,172C 403.074,173.826 403.907,175.993 404,178.5C 404.055,189.841 403.555,201.175 402.5,212.5C 401.888,216.807 403.055,220.474 406,223.5C 408.857,231.602 407.524,238.935 402,245.5C 401.833,247 401.667,248.5 401.5,250C 403.932,263.081 405.099,276.247 405,289.5C 403.895,292.937 401.728,295.437 398.5,297C 394.167,297.333 389.833,297.667 385.5,298C 385,298.5 384.5,299 384,299.5C 382.805,303.751 382.305,308.085 382.5,312.5C 380.252,310.184 378.918,307.35 378.5,304C 378.291,300.661 378.625,297.161 379.5,293.5C 381.582,293.528 383.416,292.861 385,291.5C 387,292.833 389,292.833 391,291.5C 391.333,292.167 391.667,292.833 392,293.5C 393.333,293.5 394.667,293.5 396,293.5C 396.333,292.833 396.667,292.167 397,291.5C 397.667,292.833 398.333,292.833 399,291.5C 399.973,289.053 400.806,286.553 401.5,284C 400.086,278.942 399.086,273.775 398.5,268.5C 398.939,264.256 398.939,259.923 398.5,255.5C 397.5,255.5 396.5,255.5 395.5,255.5C 396.141,251.577 396.141,247.743 395.5,244C 397.884,241.621 399.384,238.787 400,235.5C 400.333,235.833 400.667,236.167 401,236.5C 401.49,235.207 401.657,233.873 401.5,232.5C 404.797,232.671 405.131,232.005 402.5,230.5C 403.167,230.167 403.833,229.833 404.5,229.5C 401.116,225.942 398.782,221.776 397.5,217C 397.922,213.347 398.422,209.847 399,206.5C 399.667,196.5 399.667,186.5 399,176.5C 395.717,175.391 392.55,174.057 389.5,172.5C 386.484,173.659 384.484,172.659 383.5,169.5C 383.449,163.173 383.782,156.84 384.5,150.5C 382.219,131.441 382.053,112.441 384,93.5C 384.375,90.9999 385.208,88.6666 386.5,86.5C 390.123,85.8199 393.623,84.8199 397,83.5C 399.584,86.0254 401.751,85.5254 403.5,82C 403.167,81.6667 402.833,81.3333 402.5,81C 407.811,79.5627 410.644,76.0627 411,70.5C 412.205,69.9288 413.372,69.2621 414.5,68.5C 414.928,65.7574 416.095,63.4241 418,61.5C 418.684,60.2161 418.517,59.0495 417.5,58C 418.667,57.5 419.5,56.6667 420,55.5C 420.333,56.1667 420.667,56.8333 421,57.5C 422.392,55.1582 423.225,55.1582 423.5,57.5 Z"/></g>
+<g><path style="opacity:0.999" fill="#f6f4e8" d="M 387.5,116.5 C 388.186,133.158 388.519,149.824 388.5,166.5C 388.631,167.376 388.298,168.043 387.5,168.5C 386.679,165.553 386.179,162.553 386,159.5C 385.167,143.49 385.334,127.49 386.5,111.5C 387.452,113.045 387.785,114.712 387.5,116.5 Z"/></g>
+<g><path style="opacity:0.822" fill="#f2f2f6" d="M 151.5,134.5 C 150.291,138.589 148.791,142.589 147,146.5C 146.623,150.019 146.123,153.519 145.5,157C 145.755,158.326 146.422,159.326 147.5,160C 146.692,160.308 146.025,160.808 145.5,161.5C 146.531,162.7 147.365,164.034 148,165.5C 148.333,165.167 148.667,164.833 149,164.5C 150.262,166.303 151.929,167.636 154,168.5C 154.687,170.92 154.187,173.087 152.5,175C 152.833,175.333 153.167,175.667 153.5,176C 150.635,180.96 147.968,185.96 145.5,191C 145.833,191.333 146.167,191.667 146.5,192C 145.056,193.126 144.39,194.626 144.5,196.5C 145.85,204.572 146.35,212.906 146,221.5C 144.209,223.029 142.542,224.696 141,226.5C 137.904,232.087 136.904,238.087 138,244.5C 138.333,244.167 138.667,243.833 139,243.5C 141.133,247.268 140.967,250.935 138.5,254.5C 139.167,255.167 139.833,255.833 140.5,256.5C 139.87,259.316 140.536,261.982 142.5,264.5C 142.235,269.962 142.235,275.128 142.5,280C 140.208,281.197 139.875,282.863 141.5,285C 139.92,288.274 138.92,291.774 138.5,295.5C 138.737,298.063 139.237,298.063 140,295.5C 140.774,298.845 139.774,301.511 137,303.5C 136.667,306.5 136.333,309.5 136,312.5C 135.503,309.854 135.336,307.187 135.5,304.5C 136.614,293.809 137.947,283.143 139.5,272.5C 136.733,258.302 135.9,243.969 137,229.5C 137.775,225.597 139.775,222.597 143,220.5C 143.638,219.391 144.138,218.225 144.5,217C 142.335,207.526 142.168,198.026 144,188.5C 146.226,182.634 148.726,176.968 151.5,171.5C 148.535,169.365 146.035,166.698 144,163.5C 143.333,158.5 143.333,153.5 144,148.5C 144.232,147.263 144.732,146.263 145.5,145.5C 147.126,141.616 149.126,137.949 151.5,134.5 Z"/></g>
+<g><path style="opacity:1" fill="#fafbf5" d="M 343.5,242.5 C 351.925,248.483 354.092,256.15 350,265.5C 348.19,261.207 346.357,256.874 344.5,252.5C 338.255,249.566 337.921,246.233 343.5,242.5 Z"/></g>
+<g><path style="opacity:0.999" fill="#fbfbf6" d="M 344.5,305.5 C 344.539,306.583 344.873,307.583 345.5,308.5C 344.975,309.192 344.308,309.692 343.5,310C 344.863,311.945 345.697,314.112 346,316.5C 352.638,310.167 354.138,303 350.5,295C 351.059,294.275 351.392,293.442 351.5,292.5C 350.291,289.535 349.291,286.535 348.5,283.5C 349.552,283.351 350.552,283.517 351.5,284C 352.652,286.149 354.152,287.982 356,289.5C 355.756,299.144 355.589,308.811 355.5,318.5C 352.986,318.754 350.652,319.587 348.5,321C 349.517,322.049 349.684,323.216 349,324.5C 345.268,324.45 341.435,323.783 337.5,322.5C 336.671,316.923 336.671,311.423 337.5,306C 335.541,302.876 333.041,300.376 330,298.5C 329.405,297.101 329.572,295.768 330.5,294.5C 329.833,293.833 329.167,293.167 328.5,292.5C 329.309,290.929 329.643,289.262 329.5,287.5C 328.5,287.5 327.5,287.5 326.5,287.5C 324.499,282.783 322.999,277.783 322,272.5C 320.019,270.641 319.019,268.308 319,265.5C 315.882,262.93 314.715,259.596 315.5,255.5C 313.5,255.167 311.5,254.833 309.5,254.5C 309.969,250.09 308.969,246.09 306.5,242.5C 303.338,240.117 300.672,237.284 298.5,234C 296.913,233.138 295.246,232.471 293.5,232C 294.622,229.522 294.122,227.355 292,225.5C 291.349,220.707 291.849,216.04 293.5,211.5C 296.978,211.184 300.312,211.684 303.5,213C 302.72,214.073 302.887,215.24 304,216.5C 305.693,217.184 307.193,218.184 308.5,219.5C 312.817,219.07 316.984,218.07 321,216.5C 322.876,218.123 324.21,217.79 325,215.5C 325.333,216.167 325.667,216.833 326,217.5C 327,216.5 328,215.5 329,214.5C 329.333,215.167 329.667,215.833 330,216.5C 330.674,215.422 331.674,214.755 333,214.5C 337.628,216.628 341.128,219.961 343.5,224.5C 341.995,225.842 341.328,227.508 341.5,229.5C 340.448,229.649 339.448,229.483 338.5,229C 337.035,226.57 335.702,224.07 334.5,221.5C 333.554,221.013 332.554,220.68 331.5,220.5C 323.008,223.166 314.341,223.999 305.5,223C 303.217,221.129 300.717,219.629 298,218.5C 296.842,218.998 296.009,219.831 295.5,221C 303.096,230.993 310.596,241.16 318,251.5C 326.258,268.43 333.591,285.764 340,303.5C 340.333,303.167 340.667,302.833 341,302.5C 342.155,303.338 343.322,304.338 344.5,305.5 Z"/></g>
+<g><path style="opacity:0.575" fill="#f0eeec" d="M 244.5,299.5 C 246.039,301.877 247.373,304.377 248.5,307C 248.272,307.399 247.938,307.565 247.5,307.5C 244.022,303.177 240.688,298.677 237.5,294C 232.454,291.876 227.62,289.376 223,286.5C 214.748,296.243 208.914,307.243 205.5,319.5C 205.062,318.494 204.396,318.494 203.5,319.5C 203.328,317.508 203.995,315.842 205.5,314.5C 204.726,313.289 203.893,313.289 203,314.5C 202.333,312.833 202.333,311.167 203,309.5C 204.587,310.727 205.921,310.394 207,308.5C 210.232,303.237 212.399,297.57 213.5,291.5C 217.467,290.746 218.133,288.913 215.5,286C 220.544,282.23 224.877,282.896 228.5,288C 230.557,288.305 232.557,288.305 234.5,288C 234.167,288.333 233.833,288.667 233.5,289C 238.303,291.302 241.969,294.802 244.5,299.5 Z"/></g>
+<g><path style="opacity:1" fill="#f9f9f3" d="M 297.5,497.5 C 294.833,497.5 292.167,497.5 289.5,497.5C 286.194,494.217 284.527,490.217 284.5,485.5C 285.736,475.956 287.903,466.623 291,457.5C 291.667,447.5 291.667,437.5 291,427.5C 282.946,405.462 280.279,382.795 283,359.5C 286.309,352.789 287.142,345.789 285.5,338.5C 280.061,337.142 274.728,335.309 269.5,333C 262.041,324.562 254.707,316.062 247.5,307.5C 247.938,307.565 248.272,307.399 248.5,307C 247.373,304.377 246.039,301.877 244.5,299.5C 245.458,299.047 246.292,298.381 247,297.5C 250.306,303.337 254.64,308.337 260,312.5C 263.836,318.983 268.336,324.816 273.5,330C 276.408,330.689 279.075,331.855 281.5,333.5C 282.768,332.572 284.101,332.405 285.5,333C 287.191,334.405 289.024,335.572 291,336.5C 292.39,345.999 291.057,354.999 287,363.5C 286.667,362.833 286.333,362.167 286,361.5C 285.749,363.433 285.249,365.266 284.5,367C 286.729,369.553 287.062,372.386 285.5,375.5C 286.489,376.468 287.156,377.635 287.5,379C 286.652,384.528 286.318,390.194 286.5,396C 288.305,401.275 290.638,406.275 293.5,411C 291.855,412.032 291.522,413.199 292.5,414.5C 291.696,415.941 291.029,417.441 290.5,419C 291.01,420.826 291.844,420.993 293,419.5C 293.771,422.859 294.605,426.192 295.5,429.5C 295.096,433.99 295.096,438.656 295.5,443.5C 295.435,448.018 294.769,452.351 293.5,456.5C 295.611,458.981 295.611,461.647 293.5,464.5C 295.087,466.446 294.754,467.946 292.5,469C 293.059,469.725 293.392,470.558 293.5,471.5C 291.881,474.642 291.215,477.975 291.5,481.5C 290.5,481.5 289.5,481.5 288.5,481.5C 288.192,483.924 288.526,486.257 289.5,488.5C 290.086,488.291 290.586,487.957 291,487.5C 291.065,489.883 291.898,490.55 293.5,489.5C 294.855,492.211 296.189,494.878 297.5,497.5 Z"/></g>
+<g><path style="opacity:0.975" fill="#eeedf2" d="M 96.5,432.5 C 96.3337,425.159 96.5003,417.826 97,410.5C 99.561,404.275 102.561,398.275 106,392.5C 106.63,386.757 107.63,381.09 109,375.5C 116.415,362.335 124.081,349.335 132,336.5C 133.727,333.382 134.561,330.049 134.5,326.5C 135.222,326.082 135.722,325.416 136,324.5C 136.086,328.829 135.752,333.163 135,337.5C 133.077,339.119 132.577,340.952 133.5,343C 131.376,344.122 129.543,345.622 128,347.5C 125.556,353.43 122.556,359.43 119,365.5C 118.667,365.167 118.333,364.833 118,364.5C 115.408,369.433 113.075,374.1 111,378.5C 110.018,384.706 108.852,390.873 107.5,397C 100.257,407.704 96.5905,419.537 96.5,432.5 Z"/></g>
+<g><path style="opacity:0.971" fill="#fbfaf4" d="M 381.5,332.5 C 380.854,381.166 380.687,429.833 381,478.5C 384.165,484.411 385.332,490.745 384.5,497.5C 382.833,497.5 381.167,497.5 379.5,497.5C 380.468,493.907 380.801,490.407 380.5,487C 380.427,483.355 378.76,480.855 375.5,479.5C 374.185,465.8 374.185,452.134 375.5,438.5C 374.708,435.874 374.041,433.208 373.5,430.5C 374.573,423.51 375.573,416.51 376.5,409.5C 375.419,404.524 374.919,399.524 375,394.5C 375.799,398.424 376.299,398.424 376.5,394.5C 375.372,392.294 375.539,390.294 377,388.5C 377.167,385.167 377.333,381.833 377.5,378.5C 376.352,364.168 376.352,349.835 377.5,335.5C 378.5,335.5 379.5,335.5 380.5,335.5C 380.263,334.209 380.596,333.209 381.5,332.5 Z"/></g>
+<g><path style="opacity:0.545" fill="#e4e2e1" d="M 205.5,319.5 C 206.514,332.309 202.014,342.642 192,350.5C 189.568,356.942 185.568,362.276 180,366.5C 179,368.5 178,370.5 177,372.5C 177.012,380.977 176.012,389.31 174,397.5C 167.306,409.894 161.973,422.894 158,436.5C 145.003,446.011 139.503,458.678 141.5,474.5C 139.72,475.99 139.054,477.99 139.5,480.5C 137.85,468.407 139.683,456.741 145,445.5C 149.71,442.158 153.71,438.158 157,433.5C 158.595,428.211 160.095,422.878 161.5,417.5C 165.619,409.975 169.453,402.308 173,394.5C 169.788,378.792 174.454,366.126 187,356.5C 188.562,354.043 189.562,351.376 190,348.5C 193.92,346.291 197.086,343.291 199.5,339.5C 201.455,332.965 202.789,326.298 203.5,319.5C 204.396,318.494 205.062,318.494 205.5,319.5 Z"/></g>
+<g><path style="opacity:0.97" fill="#fbfbf6" d="M 354.5,440.5 C 356.555,433.939 356.888,427.273 355.5,420.5C 355.631,419.761 355.464,419.094 355,418.5C 353.274,419.576 351.441,419.743 349.5,419C 348.167,418 348.167,417 349.5,416C 354.115,415.761 358.615,415.594 363,415.5C 363.433,417.664 362.933,419.664 361.5,421.5C 364.802,429.201 365.469,437.201 363.5,445.5C 358.167,446.167 358.167,446.833 363.5,447.5C 362.189,451.468 360.855,455.468 359.5,459.5C 359.716,461.384 360.383,463.051 361.5,464.5C 360.354,465.719 359.354,467.052 358.5,468.5C 356.291,469.106 354.124,469.773 352,470.5C 351.667,468.5 351.333,466.5 351,464.5C 346.597,464.263 344.43,461.93 344.5,457.5C 342.418,457.528 340.584,456.861 339,455.5C 337.88,448.788 337.38,442.122 337.5,435.5C 337.594,433.311 338.261,431.311 339.5,429.5C 337.626,426.667 336.626,423.833 336.5,421C 339.105,418.661 339.438,416.328 337.5,414C 339.762,413.358 341.929,412.525 344,411.5C 345.022,412.354 345.855,413.354 346.5,414.5C 344.283,419.544 342.283,424.211 340.5,428.5C 341,429.5 341.5,430.5 342,431.5C 342.333,431.167 342.667,430.833 343,430.5C 343.366,437.28 343.532,443.947 343.5,450.5C 347.858,454.196 351.525,458.53 354.5,463.5C 355.451,464.326 356.451,464.492 357.5,464C 357.167,463.667 356.833,463.333 356.5,463C 357.293,459.589 357.793,456.089 358,452.5C 358.333,452.833 358.667,453.167 359,453.5C 359.573,448.385 358.073,444.052 354.5,440.5 Z M 355.5,420.5 C 356.888,427.273 356.555,433.939 354.5,440.5C 353.852,442.086 353.352,443.753 353,445.5C 352.554,442.657 352.054,439.824 351.5,437C 352.302,433.596 353.302,430.263 354.5,427C 354.297,424.594 353.297,422.594 351.5,421C 352.793,420.51 354.127,420.343 355.5,420.5 Z"/></g>
+<g><path style="opacity:0.745" fill="#f0eff4" d="M 87.5,497.5 C 86.5,497.5 85.5,497.5 84.5,497.5C 87.0436,480.253 90.8769,463.253 96,446.5C 96.7189,442.855 97.2189,439.188 97.5,435.5C 97.369,434.761 97.5357,434.094 98,433.5C 99.9608,440.25 99.4608,446.916 96.5,453.5C 96.7093,454.086 97.0426,454.586 97.5,455C 94.5461,465.038 91.5461,475.204 88.5,485.5C 87.5091,489.445 87.1758,493.445 87.5,497.5 Z"/></g>
+<g><path style="opacity:0.773" fill="#c0c0c5" d="M 141.5,474.5 C 141.5,476.5 141.5,478.5 141.5,480.5C 140.71,481.609 140.21,482.942 140,484.5C 139.51,483.207 139.343,481.873 139.5,480.5C 139.054,477.99 139.72,475.99 141.5,474.5 Z"/></g>
+</svg>]])
+
+local dragging_fn = function(name, base_x, base_y) return (function()local a={}local b,c,d,e,f,g,h,i,j,k,l,m,n,o;local p={__index={drag=function(self,...)local q,r=self:get()local s,t=a.drag(q,r,...)if q~=s or r~=t then self:set(s,t)end;return s,t end,set=function(self,q,r)local j,k=client_screen_size()ui_set(self.x_reference,q/j*self.res)ui_set(self.y_reference,r/k*self.res)end,get=function(self)local j,k=client_screen_size()return ui_get(self.x_reference)/self.res*j,ui_get(self.y_reference)/self.res*k end}}function a.new(u,v,w,x)x=x or 10000;local j,k=client_screen_size()local y=ui_new_slider('LUA','A',u..' window position',0,x,v/j*x)local z=ui_new_slider('LUA','A','\n'..u..' window position y',0,x,w/k*x)ui_set_visible(y,false)ui_set_visible(z,false)return setmetatable({name=u,x_reference=y,y_reference=z,res=x},p)end;function a.drag(q,r,A,B,C,D,E)if globals_framecount()~=b then c=ui_is_menu_open()f,g=d,e;d,e=ui_mouse_position()i=h;h=client_key_state(0x01)==true;m=l;l={}o=n;n=false;j,k=client_screen_size()end;if c and i~=nil then if(not i or o)and h and f>q and g>r and f<q+A and g<r+B then n=true;q,r=q+d-f,r+e-g;if not D then q=math_max(0,math_min(j-A,q))r=math_max(0,math_min(k-B,r))end end end;table_insert(l,{q,r,A,B})return q,r,A,B end;return a end)().new(name, base_x, base_y) end
+local graphs = function()local a={}function a:renderer_line(b,c,d)renderer_line(b.x,b.y,c.x,c.y,d.r,d.g,d.b,d.a)end;function a:renderer_rectangle_outlined(b,c,d)renderer_line(b.x,b.y,b.x,c.y,d.r,d.g,d.b,d.a)renderer_line(b.x,b.y,c.x,b.y,d.r,d.g,d.b,d.a)renderer_line(c.x,b.y,c.x,c.y,d.r,d.g,d.b,d.a)renderer_line(b.x,c.y,c.x,c.y,d.r,d.g,d.b,d.a)end;function a:renderer_rectangle_filled(b,c,d)local e=c.x-b.x;local f=c.y-b.y;if e<0 then if f<0 then renderer_rectangle(c.x,c.y,-e,-f,d.r,d.g,d.b,d.a)else renderer_rectangle(c.x,b.y,-e,f,d.r,d.g,d.b,d.a)end else if f<0 then renderer_rectangle(b.x,c.y,e,-f,d.r,d.g,d.b,d.a)else renderer_rectangle(b.x,b.y,e,f,d.r,d.g,d.b,d.a)end end end;function a:renderer_rectangle_outlined(b,c,d)renderer_line(b.x,b.y,b.x,c.y,d.r,d.g,d.b,d.a)renderer_line(b.x,b.y,c.x,b.y,d.r,d.g,d.b,d.a)renderer_line(c.x,b.y,c.x,c.y,d.r,d.g,d.b,d.a)renderer_line(b.x,c.y,c.x,c.y,d.r,d.g,d.b,d.a)end;function a:renderer_rectangle_filled_gradient(b,c,g,h,i)local e=c.x-b.x;local f=c.y-b.y;if e<0 then if f<0 then renderer_gradient(c.x,c.y,-e,-f,g.r,g.g,g.b,g.a,h.r,h.g,h.b,h.a,i)else renderer_gradient(c.x,b.y,-e,f,g.r,g.g,g.b,g.a,h.r,h.g,h.b,h.a,i)end else if f<0 then renderer_gradient(b.x,c.y,e,-f,h.r,h.g,h.b,h.a,g.r,g.g,g.b,g.a,i)else renderer_gradient(b.x,b.y,e,f,h.r,h.g,h.b,h.a,g.r,g.g,g.b,g.a,i)end end end;function a:draw(j,k,l,m,n,o)local p=k;local q=n.clr_1;k=0;l=l-p;n.h=n.h-n.thickness;if o then a:renderer_rectangle_outlined({x=n.x,y=n.y},{x=n.x+n.w-1,y=n.y+n.h-1+n.thickness},{r=q[1],g=q[2],b=q[3],a=q[4]})end;if k==l then a:renderer_line({x=n.x,y=n.y+n.h},{x=n.x+n.w,y=n.y+n.h},{r=q[1],g=q[2],b=q[3],a=q[4]})return end;local r=n.w/(m-1)local s=l-k;for t=1,m-1 do local u={(j[t]-p)/s,(j[t+1]-p)/s}local v={{x=n.x+r*(t-1),y=n.y+n.h-n.h*u[1]},{x=n.x+r*t,y=n.y+n.h-n.h*u[2]}}for t=1,n.thickness do a:renderer_line({x=v[1].x,y=v[1].y+t-1},{x=v[2].x,y=v[2].y+t-1},{r=q[1],g=q[2],b=q[3],a=q[4]})end end end;function a:draw_histogram(j,k,l,m,n,o)local p=k;k=0;l=l-p;if o then a:renderer_rectangle_outlined({x=n.x,y=n.y},{x=n.x+n.w-1,y=n.y+n.h-1},{r=255,g=255,b=255,a=255})end;local r=n.w/(m-1)local s=l-k;for t=1,m-1 do local u={(j[t]-p)/s,(j[t+1]-p)/s}local v={{x=math_floor(n.x+r*(t-1)),y=math_floor(n.y+n.h-n.h*u[1])},{x=math_floor(n.x+r*t),y=math_floor(n.y+n.h)},isZero=math_floor(n.y+n.h)==math_floor(n.y+n.h-n.h*u[1])}if n.sDrawBar=="fill"then a:renderer_rectangle_filled({x=v[1].x,y=v[1].y},{x=v[2].x,y=v[2].y},{r=n.clr_1[1],g=n.clr_1[2],b=n.clr_1[3],a=n.clr_1[4]})elseif n.sDrawBar=="gradient_fadeout"then a:renderer_rectangle_filled_gradient({x=v[1].x,y=v[1].y},{x=v[2].x,y=v[2].y},{r=n.clr_1[1],g=n.clr_1[2],b=n.clr_1[3],a=0},{r=n.clr_1[1],g=n.clr_1[2],b=n.clr_1[3],a=n.clr_1[4]},false)elseif n.sDrawBar=="gradient_fadein"then a:renderer_rectangle_filled_gradient({x=v[1].x,y=v[1].y},{x=v[2].x,y=v[2].y},{r=n.clr_1[1],g=n.clr_1[2],b=n.clr_1[3],a=n.clr_1[4]},{r=n.clr_1[1],g=n.clr_1[2],b=n.clr_1[3],a=0},false)else end;if n.bDrawPeeks and not v.isZero then a:renderer_line({x=v[1].x,y=v[1].y},{x=v[2].x,y=v[1].y},{r=n.clr_2[1],g=n.clr_2[2],b=n.clr_2[3],a=n.clr_2[4]})end end end;return a end
+local gram_create = function(value, count) local gram = { }; for i=1, count do gram[i] = value; end return gram; end
+local gram_update = function(tab, value, forced) local new_tab = tab; if forced or new_tab[#new_tab] ~= value then table_insert(new_tab, value); table_remove(new_tab, 1); end; tab = new_tab; end
+local get_average = function(tab) local elements, sum = 0, 0; for k, v in pairs(tab) do sum = sum + v; elements = elements + 1; end return sum / elements; end
+local hsv_to_rgb = function(b,c,d,e)local f,g,h;local i=math_floor(b*6)local j=b*6-i;local k=d*(1-c)local l=d*(1-j*c)local m=d*(1-(1-j)*c)i=i%6;if i==0 then f,g,h=d,m,k elseif i==1 then f,g,h=l,d,k elseif i==2 then f,g,h=k,d,m elseif i==3 then f,g,h=k,l,d elseif i==4 then f,g,h=m,k,d elseif i==5 then f,g,h=d,k,l end;return f*255,g*255,h*255,e*255 end
+local notes = function(b)local c=function(d,e)local f={}for g in pairs(d)do table_insert(f,g)end;table_sort(f,e)local h=0;local i=function()h=h+1;if f[h]==nil then return nil else return f[h],d[f[h]]end end;return i end;local j={get=function(k)local l,m=0,{}for n,o in c(package.idealyaw_notes)do if o==true then l=l+1;m[#m+1]={n,l}end end;for p=1,#m do if m[p][1]==b then return k(m[p][2]-1)end end end,set_state=function(q)package.idealyaw_notes[b]=q;table_sort(package.idealyaw_notes)end,unset=function()client_unset_event_callback('shutdown',callback)end}client_set_event_callback('shutdown',function()if package.idealyaw_notes[b]~=nil then package.idealyaw_notes[b]=nil end end)if package.idealyaw_notes==nil then package.idealyaw_notes={}end;return j end
+local item_count = function(b)if b==nil then return 0 end;if#b==0 then local c=0;for d in pairs(b)do c=c+1 end;return c end;return#b end
+local contains = function(b,c)for d=1,#b do if b[d]==c then return true end end;return false end
+local create_integer = function(b,c,d,e)return{min=b,max=c,init_val=d,scale=e,value=d}end
+
+
+local read_database = function(script_name, db_name, original)
+	if (script_name == nil or script_name == '') or (db_name == nil or db_name == '') or (original == nil or original == { }) then
+		client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+		client_color_log(255, 0, 0, 'Error occured while parsing data')
+		
+		error()
+	end
+
+	local dbase = database_read(db_name)
+	local new_data, corrupted_data, missing_sectors =
+		false, false, { }
+
+	if dbase == nil then 
+		dbase, new_data = original, true
+	else
+		for name in pairs(dbase) do
+			local found_sector = false
+
+			for oname in pairs(original) do
+				if name == oname then
+					found_sector = true
+				end
+			end
+
+			if not found_sector then
+				dbase[name] = nil
+			end
+		end
+
+		for name, val in pairs(original) do
+			if dbase[name] == nil then	
+				dbase[name], corrupted_data = val, true
+				missing_sectors[#missing_sectors+1] = '*' .. name
+			else
+				local corrupted_sector = false
+				for sname, sdata in pairs(val) do
+					if sname ~= 'keybinds' and dbase[name][sname] == nil or type(sdata) ~= type(dbase[name][sname]) then
+						dbase[name][sname], corrupted_data = sdata, true
+
+						if not corrupted_sector then
+							missing_sectors[#missing_sectors+1] = '*' .. name
+							corrupted_sector = true
+						end
+					end
+				end
+			end
+		end
+
+		if #missing_sectors > 0 then
+			client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+			client_color_log(255, 255, 255, ('Repairing %d sector(s) \1\0'):format(#missing_sectors))
+			client_color_log(155, 220, 220, ('[ %s ]'):format(table_concat(missing_sectors, ' ')))
+		end
+	end
+
+	if new_data or corrupted_data then
+		database_write(db_name, dbase)
+	end
+
+	return dbase, original
+end
+
+local script_name = 'idealyaw'
+local database_name = 'idealyaw'
+local menu_tab = { 'LUA', 'A', 'B' }
+local menu_palette = { 'Solid', 'Fade', 'Dynamic fade' }
+local m_hotkeys, m_hotkeys_update, m_hotkeys_create = { }, true
+
+local ms_watermark = ui_new_checkbox('CONFIG', 'Presets', 'Watermark')
+local ms_spectators = ui_new_checkbox('CONFIG', 'Presets', 'Spectators')
+local ms_keybinds = ui_new_checkbox('CONFIG', 'Presets', 'Hotkey list')
+local ms_antiaim = ui_new_checkbox('CONFIG', 'Presets', 'Anti-aimbot indication')
+local ms_ieinfo = ui_new_checkbox('CONFIG', 'Presets', 'Frequency update information')
+
+local ms_palette, ms_color = 
+	ui_new_combobox('CONFIG', 'Presets', 'idealyaw Palette', menu_palette),
+	ui_new_color_picker('CONFIG', 'Presets', 'idealyaw Global color', 142, 165, 229, 85)
+
+local ms_fade_offset = ui_new_slider('CONFIG', 'Presets', 'Fade offset', 1, 1000, 825, false, nil, 0.001)
+local ms_fade_frequency = ui_new_slider('CONFIG', 'Presets', 'Fade frequency', 1, 100, 10, false, nil, 0.01)
+local ms_fade_split_ratio = ui_new_slider('CONFIG', 'Presets', 'Fade split ratio', 0, 100, 100, false, nil, 0.01)
+
+local script_db, original_db = read_database(script_name, database_name, {
+	watermark = {
+		nickname = '',		
+		beta_status = true,
+		gc_state = true,
+		style = create_integer(1, 4, 1, 1),
+		suffix = nil,
+	},
+
+	spectators = {
+		avatars = true,
+		auto_position = true
+	},
+
+	keybinds = {
+		{
+			require = '',
+			reference = { 'legit', 'aimbot', 'Enabled' },
+			custom_name = 'Legit aimbot',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'legit', 'triggerbot', 'Enabled' },
+			custom_name = 'Legit triggerbot',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'aimbot', 'Enabled' },
+			custom_name = 'Rage aimbot',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'aimbot', 'Force safe point' },
+			custom_name = 'Force safe point',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'aimbot', 'Force body aim' },
+			custom_name = 'Force body aim',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'aimbot', 'Override hitbox selection' },
+			custom_name = 'Hitbox override',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'aimbot', 'Minimum damage override' },
+			custom_name = 'Min damage override',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'aimbot', 'Hide shots' },
+			custom_name = 'Hide shots',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'aimbot', 'Double tap' },
+			custom_name = 'Double tap',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'other', 'Quick peek assist' },
+			custom_name = 'Quick peek assist',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'other', 'Quick stop' },
+			custom_name = 'Quick stop',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'other', 'Duck peek assist' },
+			custom_name = 'Duck peek assist',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'rage', 'other', 'Anti-aim correction override' },
+			custom_name = 'Resolver override',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'aa', 'anti-aimbot angles', 'Inverter' },
+			custom_name = 'Inverter',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'aa', 'anti-aimbot angles (2)', 'Freestanding' },
+			custom_name = 'Freestanding',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'aa', 'other', 'Slow motion' },
+			custom_name = 'Slow motion',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'aa', 'other', 'On shot anti-aim' },
+			custom_name = 'On shot anti-aim',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'aa', 'other', 'Fake duck' },
+			custom_name = 'Fake duck',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'aa', 'other', 'Fake peek' },
+			custom_name = 'Fake peek',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'movement', 'Z-Hop' },
+			custom_name = 'Z-Hop',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'movement', 'Pre-speed' },
+			custom_name = 'Pre-speed',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'movement', 'Blockbot' },
+			custom_name = 'Blockbot',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'movement', 'Jump at edge' },
+			custom_name = 'Jump at edge',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'movement', 'Edge bug' },
+			custom_name = 'Edge bug',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'miscellaneous', 'Last second defuse' },
+			custom_name = 'Last second defuse',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'miscellaneous', 'Free look' },
+			custom_name = 'Free look',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'miscellaneous', 'Ping spike' },
+			custom_name = 'Ping spike',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'miscellaneous', 'Automatic grenade release' },
+			custom_name = 'Grenade release',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'miscellaneous', 'Grenade prediction' },
+			custom_name = 'Grenade prediction',
+			ui_offset = 1
+		},
+
+		{
+			require = '',
+			reference = { 'misc', 'miscellaneous', 'Steal name' },
+			custom_name = 'Steal name',
+			ui_offset = 2
+		},
+
+		{
+			require = '',
+			reference = { 'visuals', 'player esp', 'Activation type' },
+			custom_name = 'ESP Activation',
+			ui_offset = 1
+		},
+	},
+})
+
+local get_bar_color = function()
+	local r, g, b, a = ui_get(ms_color)
+
+	local palette = ui_get(ms_palette)
+
+	if palette ~= menu_palette[1] then
+		local rgb_split_ratio = ui_get(ms_fade_split_ratio) / 100
+
+		local h = palette == menu_palette[3] and 
+			globals_realtime() * (ui_get(ms_fade_frequency) / 100) or 
+			ui_get(ms_fade_offset) / 1000
+
+		r, g, b = hsv_to_rgb(h, 1, 1, 1)
+		r, g, b = 
+			r * rgb_split_ratio, 
+			g * rgb_split_ratio, 
+			b * rgb_split_ratio
+	end
+
+	return r, g, b, a
+end
+
+local get_color = function(number, max, i)
+    local Colors = {
+        { 255, 0, 0 },
+        { 237, 27, 3 },
+        { 235, 63, 6 },
+        { 229, 104, 8 },
+        { 228, 126, 10 },
+        { 220, 169, 16 },
+        { 213, 201, 19 },
+        { 176, 205, 10 },
+        { 124, 195, 13 }
+    }
+
+    local math_num = function(int, max, declspec)
+        local int = (int > max and max or int)
+        local tmp = max / int;
+
+        if not declspec then declspec = max end
+
+        local i = (declspec / tmp)
+        i = (i >= 0 and math_floor(i + 0.5) or math_ceil(i - 0.5))
+
+        return i
+    end
+
+    i = math_num(number, max, #Colors)
+
+    return
+        Colors[i <= 1 and 1 or i][1], 
+        Colors[i <= 1 and 1 or i][2],
+        Colors[i <= 1 and 1 or i][3],
+        i
+end
+
+local ms_classes = {
+	watermark = function()
+		local note = notes 'a_watermark'
+		local cstyle = { [1] = 'gamesense ', [2] = 'idealyaw', [3] = 'brother-tech', [4] = 'skeet.cc' }
+	
+		local has_beta = pcall(ui_reference, 'misc', 'Settings', 'Crash logs')
+		local get_name = panorama_loadstring([[ return MyPersonaAPI.GetName() ]])
+		local get_gc_state = panorama_loadstring([[ return MyPersonaAPI.IsConnectedToGC() ]])
+	
+		local classptr = ffi.typeof('void***')
+		local latency_ptr = ffi.typeof('float(__thiscall*)(void*, int)')
+	
+		local rawivengineclient = client_create_interface('engine.dll', 'VEngineClient014') or error('VEngineClient014 wasnt found', 2)
+		local ivengineclient = ffi.cast(classptr, rawivengineclient) or error('rawivengineclient is nil', 2)
+		local is_in_game = ffi.cast('bool(__thiscall*)(void*)', ivengineclient[0][26]) or error('is_in_game is nil')
+
+	
+		local g_paint_handler = function()
+			local state = ui_get(ms_watermark)
+			local r, g, b, a = get_bar_color()
+	
+			note.set_state(state)
+	
+			note.get(function(id)
+				local data_wm = script_db.watermark or { }
+				local data_nickname = data_wm.nickname and tostring(data_wm.nickname) or ''
+				local data_suffix = (data_wm.suffix and tostring(data_wm.suffix) or ''):gsub('beta', '')
+	
+				if data_wm.beta_status and has_beta and (not data_suffix or #data_suffix < 1) then
+					data_suffix = 'beta'
+				end
+	
+				local sys_time = { client_system_time() }
+				local actual_time = ('%02d:%02d:%02d'):format(sys_time[1], sys_time[2], sys_time[3])
+	
+				local is_connected_to_gc = not data_wm.gc_state or get_gc_state()
+				local gc_state = not is_connected_to_gc and '\x20\x20\x20\x20\x20' or ''
+	
+				local nickname = #data_nickname > 0 and data_nickname or get_name()
+				local suffix = ('%s%s'):format(
+					cstyle[data_wm.style and data_wm.style.value or 1] or cstyle[1], 
+					#data_suffix > 0 and (' [%s]'):format(data_suffix) or ''
+				)
+				
+				local latency = math.floor(client.latency() * 1000)
+				local latency_text = (' | delay: %3dms'):format(latency)
+
+	
+				local text = ('%s%s | %s%s | %s'):format(gc_state, suffix, nickname, latency_text, actual_time)
+	
+				local text_prefix = suffix:find("idealyaw") and "ideal" or suffix
+				local text_colored = suffix:find("idealyaw") and "yaw" or ""
+				local rest = (" | %s%s | %s"):format(nickname, latency_text, actual_time)
+
+	
+				local w = renderer_measure_text(nil, text_prefix)
+					+ renderer_measure_text(nil, text_colored)
+					+ renderer_measure_text(nil, rest)
+					+ 4 + 22 
+			        - 6
+	
+				local h = 18
+				local x, y = client_screen_size(), 10 + (25*id)
+				x = x - w - 10
+	
+				if ui_get(ms_palette) == menu_palette[1] then
+					renderer_rectangle(x, y, w, 2, r, g, b, 255)
+				else
+					renderer_gradient(x, y, (w/2)+1, 2, g, b, r, 255, r, g, b, 255, true)
+					renderer_gradient(x + w/2, y, w-w/2, 2, r, g, b, 255, b, r, g, 255, true)
+				end
+	
+				renderer_rectangle(x, y + 2, w, h, 17, 17, 17, a)
+	
+				if icon and icon.texture then
+					renderer_texture(icon.texture, x + 4, y + 4, 16, 16, 255, 255, 255, 255, 'f')
+				end
+	
+				local offset = 24 
+				renderer_text(x + offset -8, y + 4, 255, 255, 255, 255, '', 0, text_prefix)
+				offset = offset + renderer_measure_text(nil, text_prefix)
+	
+				renderer_text(x + offset -8, y + 4, 173, 216, 230, 255, '', 0, text_colored)
+				offset = offset + renderer_measure_text(nil, text_colored)
+	
+				renderer_text(x + offset -8, y + 4, 255, 255, 255, 255, '', 0, rest)
+	
+				if not is_connected_to_gc then
+					local realtime = globals_realtime()*1.5
+					
+					if realtime%2 <= 1 then
+						renderer_circle_outline(x+10, y + 11, 89, 119, 239, 255, 5, 0, realtime%1, 2)
+					else
+						renderer_circle_outline(x+10, y + 11, 89, 119, 239, 255, 5, realtime%1*370, 1-realtime%1, 2)
+					end
+				end
+			end)
+		end
+	
+		client_set_event_callback('paint_ui', g_paint_handler)
+	end,
+
+	spectators = function()
+		local screen_size = { client_screen_size() }
+		local screen_size = {
+			screen_size[1] - screen_size[1] * cvar.safezonex:get_float(),
+			screen_size[2] * cvar.safezoney:get_float()
+		}
+
+		local dragging = dragging_fn('Spectators', screen_size[1] / 1.385, screen_size[2] / 2)
+		local m_alpha, m_active, m_contents, unsorted = 0, {}, {}, {}
+
+		local get_spectating_players = function()
+			local me = entity_get_local_player()
+
+			local players, observing = { }, me
+		
+			for i = 1, globals_maxplayers() do
+				if entity_get_classname(i) == 'CCSPlayer' then
+					local m_iObserverMode = entity_get_prop(i, 'm_iObserverMode')
+					local m_hObserverTarget = entity_get_prop(i, 'm_hObserverTarget')
+		
+					if m_hObserverTarget ~= nil and m_hObserverTarget <= 64 and not entity_is_alive(i) and (m_iObserverMode == 4 or m_iObserverMode == 5) then
+						if players[m_hObserverTarget] == nil then
+							players[m_hObserverTarget] = { }
+						end
+		
+						if i == me then
+							observing = m_hObserverTarget
+						end
+		
+						table_insert(players[m_hObserverTarget], i)
+					end
+				end
+			end
+		
+			return players, observing
+		end
+
+		local g_paint_handler = function()
+			local data_sp = script_db.spectators or { }
+
+			local master_switch = ui_get(ms_spectators)
+			local is_menu_open = ui_is_menu_open()
+			local frames = 8 * globals_frametime()
+		
+			local latest_item = false
+			local maximum_offset = 85
+		
+			local me = entity_get_local_player()
+			local spectators, player = get_spectating_players()
+		
+			for i=1, 64 do 
+				unsorted[i] = {
+					idx = i,
+					active = false
+				}
+			end
+		
+			if spectators[player] ~= nil then
+				for _, spectator in pairs(spectators[player]) do
+					unsorted[spectator] = { 
+						idx = spectator,
+		
+						active = (function()
+							if spectator == me then
+								return false
+							end
+
+							return true
+						end)(),
+
+						avatar = (function()
+							if not data_sp.avatars then
+								return nil
+							end
+
+							local steam_id = entity_get_steam64(spectator)
+							local avatar = images.get_steam_avatar(steam_id)
+		
+							if steam_id == nil or avatar == nil then
+								return nil
+							end
+		
+							if m_contents[spectator] == nil or m_contents[spectator].conts ~= avatar.contents then
+								m_contents[spectator] = {
+									conts = avatar.contents,
+									texture = renderer_load_rgba(avatar.contents, avatar.width, avatar.height)
+								}
+							end
+		
+							return m_contents[spectator].texture
+						end)()
+					}
+				end
+			end
+		
+			for _, c_ref in pairs(unsorted) do
+				local c_id = c_ref.idx
+				local c_nickname = entity_get_player_name(c_ref.idx)
+		
+				if c_ref.active then
+					latest_item = true
+		
+					if m_active[c_id] == nil then
+						m_active[c_id] = {
+							alpha = 0, offset = 0, active = true
+						}
+					end
+		
+					local text_width = renderer_measure_text(nil, c_nickname)
+		
+					m_active[c_id].active = true
+					m_active[c_id].offset = text_width
+					m_active[c_id].alpha = m_active[c_id].alpha + frames
+					m_active[c_id].avatar = c_ref.avatar
+					m_active[c_id].name = c_nickname
+		
+					if m_active[c_id].alpha > 1 then
+						m_active[c_id].alpha = 1
+					end
+				elseif m_active[c_id] ~= nil then
+					m_active[c_id].active = false
+					m_active[c_id].alpha = m_active[c_id].alpha - frames
+		
+					if m_active[c_id].alpha <= 0 then
+						m_active[c_id] = nil
+					end
+				end
+		
+				if m_active[c_id] ~= nil and m_active[c_id].offset > maximum_offset then
+					maximum_offset = m_active[c_id].offset
+				end
+			end
+		
+			if is_menu_open and not latest_item then
+				local case_name = ' '
+				local text_width = renderer_measure_text(nil, case_name)
+		
+				latest_item = true
+				maximum_offset = maximum_offset < text_width and text_width or maximum_offset
+		
+				m_active[case_name] = {
+					name = '',
+					active = true,
+					offset = text_width,
+					alpha = 1
+				}
+			end
+		
+			local text = 'spectators'
+			local x, y = dragging:get()
+			local r, g, b, a = get_bar_color()
+		
+			local height_offset = 23
+			local w, h = 55 + maximum_offset, 50
+		
+			w = w - (data_sp.avatars and 0 or 17) 
+
+			local right_offset = data_sp.auto_position and (x+w/2) > (({ client_screen_size() })[1] / 2)
+
+			if ui_get(ms_palette) == menu_palette[1] then
+				renderer_rectangle(x, y, w, 2, r, g, b, m_alpha*255)
+			else
+				renderer_gradient(x, y, (w/2)+1, 2, g, b, r, m_alpha*255, r, g, b, m_alpha*255, true)
+				renderer_gradient(x + w/2, y, w-w/2, 2, r, g, b, m_alpha*255, b, r, g, m_alpha*255, true)
+			end
+
+			renderer_rectangle(x, y + 2, w, 18, 17, 17, 17, m_alpha*a)
+		
+			renderer_text(x - renderer_measure_text(nil, text) / 2 + w/2, y + 4, 255, 255, 255, m_alpha*255, '', 0, text)
+		
+			for c_name, c_ref in pairs(m_active) do
+				local _, text_h = renderer_measure_text(nil, c_ref.name)
+
+				renderer_text(x + ((c_ref.avatar and not right_offset) and text_h or -5) + 10, y + height_offset, 255, 255, 255, m_alpha*c_ref.alpha*255, '', 0, c_ref.name)
+		
+				if c_ref.avatar ~= nil then
+					renderer_texture(c_ref.avatar, x + (right_offset and w - 15 or 5), y + height_offset, text_h, text_h, 255, 255, 255, m_alpha*c_ref.alpha*255, 'f')
+				end
+		
+				height_offset = height_offset + 15
+			end
+
+			dragging:drag(w, (3 + (15 * item_count(m_active))) * 2)
+
+			if master_switch and item_count(m_active) > 0 and latest_item then
+				m_alpha = m_alpha + frames; if m_alpha > 1 then m_alpha = 1 end
+			else
+				m_alpha = m_alpha - frames; if m_alpha < 0 then m_alpha = 0 end 
+			end
+		
+			if is_menu_open then
+				m_active[' '] = nil
+			end
+		end
+
+		client_set_event_callback('paint', g_paint_handler)
+	end,
+
+	keybinds = function()
+		local screen_size = { client_screen_size() }
+		local screen_size = {
+			screen_size[1] - screen_size[1] * cvar.safezonex:get_float(),
+			screen_size[2] * cvar.safezoney:get_float()
+		}
+
+		local dragging = dragging_fn('Keybinds', screen_size[1] / 1.385, screen_size[2] / 2.5)
+
+		local m_alpha, m_active = 0, { }
+		local hotkey_modes = { 'holding', 'toggled', 'disabled' }
+
+		local elements = {
+			rage = { 'aimbot', 'other' },
+			aa = { 'anti-aimbot angles', 'fake lag', 'other' },
+			legit = { 'weapon type', 'aimbot', 'triggerbot', 'other' },
+			visuals = { 'player esp', 'colored models', 'other esp', 'effects' },
+			misc = { 'miscellaneous', 'movement', 'settings' },
+			skins = { 'knife options', 'glove options', 'weapon skin' },
+			players = { 'players', 'adjustments' },
+			config = { 'presets', 'lua' },
+			lua = { 'a', 'b' }
+		}
+
+		local reference_if_exists = function(...)
+			if pcall(ui_reference, ...) then
+				 return true
+			end
+		end
+
+		local create_item = function(data)
+			local collected = { }
+
+			local cname = data.custom_name
+			local reference = { ui_reference(unpack(data.reference)) }
+		
+			for i=1, #reference do
+				if i <= data.ui_offset then
+					collected[i] = reference[i]
+				end
+			end
+		
+			cname = (cname and #tostring(cname) > 0) and cname or nil
+
+			data.reference[3] = data.ui_offset == 2 and ui_name(collected[1]) or data.reference[3]
+
+			m_hotkeys[cname or (data.reference[3] or '?')] = {
+				reference = data.reference,
+
+				ui_offset = data.ui_offset,
+				custom_name = cname,
+				custom_file = data.require,
+				collected = collected
+			}
+
+			return true
+		end
+		
+		local create_custom_item = function(pdata)
+			local reference = pdata.reference
+
+			if  reference == nil or elements[reference[1]:lower()] == nil or 
+				not contains(elements[reference[1]:lower()], reference[2]:lower()) then
+				return false
+			end
+
+			if reference_if_exists(unpack(reference)) then
+				return create_item(pdata)
+			else
+				if pcall(require, pdata.require) and reference_if_exists(unpack(reference)) then
+					return create_item(pdata)
+				else
+					local name = (pdata.require and #pdata.require > 0) and (pdata.require .. '.lua') or '-'
+
+					client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+					client_color_log(155, 220, 220, ('Unable to reference hotkey: %s [ %s ]'):format(reference[3], name))
+				end
+			end
+
+			return false
+		end
+
+		local g_paint_handler = function()
+			local master_switch = ui_get(ms_keybinds)
+
+			local is_menu_open = ui_is_menu_open()
+			local frames = 8 * globals_frametime()
+		
+			local latest_item = false
+			local maximum_offset = 66
+
+			if m_hotkeys_update == true then
+				m_hotkeys = { }
+				m_active = { }
+
+				for _, item in pairs((script_db.keybinds or { })) do
+					create_custom_item({
+						reference = item.reference,
+						custom_name = item.custom_name,
+						ui_offset = item.ui_offset or 1,
+						require = item.require
+					})
+				end
+
+				m_hotkeys_update = false
+			end
+		
+			for c_name, c_data in pairs(m_hotkeys) do
+				local item_active = true
+				local c_ref = c_data.collected
+
+				local items = item_count(c_ref)
+				local state = { ui_get(c_ref[items]) }
+		
+				if items > 1 then
+					item_active = ui_get(c_ref[1])
+				end
+		
+				if item_active and state[2] ~= 0 and (state[2] == 3 and not state[1] or state[2] ~= 3 and state[1]) then
+					latest_item = true
+		
+					if m_active[c_name] == nil then
+						m_active[c_name] = {
+							mode = '', alpha = 0, offset = 0, active = true
+						}
+					end
+		
+					local text_width = renderer_measure_text(nil, c_name)
+		
+					m_active[c_name].active = true
+					m_active[c_name].offset = text_width
+					m_active[c_name].mode = hotkey_modes[state[2]]
+					m_active[c_name].alpha = m_active[c_name].alpha + frames
+		
+					if m_active[c_name].alpha > 1 then
+						m_active[c_name].alpha = 1
+					end
+				elseif m_active[c_name] ~= nil then
+					m_active[c_name].active = false
+					m_active[c_name].alpha = m_active[c_name].alpha - frames
+		
+					if m_active[c_name].alpha <= 0 then
+						m_active[c_name] = nil
+					end
+				end
+		
+				if m_active[c_name] ~= nil and m_active[c_name].offset > maximum_offset then
+					maximum_offset = m_active[c_name].offset
+				end
+			end
+		
+			if is_menu_open and not latest_item then
+				local case_name = 'Menu toggled'
+				local text_width = renderer_measure_text(nil, case_name)
+		
+				latest_item = true
+				maximum_offset = maximum_offset < text_width and text_width or maximum_offset
+		
+				m_active[case_name] = {
+					active = true,
+					offset = text_width,
+					mode = '~',
+					alpha = 1,
+				}
+			end
+		
+			local text = 'keybinds'
+			local x, y = dragging:get()
+			local r, g, b, a = get_bar_color()
+		
+			local height_offset = 23
+			local w, h = 75 + maximum_offset, 50
+		
+			if ui_get(ms_palette) == menu_palette[1] then
+				renderer_rectangle(x, y, w, 2, r, g, b, m_alpha*255)
+			else
+				renderer_gradient(x, y, (w/2)+1, 2, g, b, r, m_alpha*255, r, g, b, m_alpha*255, true)
+				renderer_gradient(x + w/2, y, w-w/2, 2, r, g, b, m_alpha*255, b, r, g, m_alpha*255, true)
+			end
+
+			renderer_rectangle(x, y + 2, w, 18, 17, 17, 17, m_alpha*a)
+			renderer_text(x - renderer_measure_text(nil, text) / 2 + w/2, y + 4, 255, 255, 255, m_alpha*255, '', 0, text)
+		
+			for c_name, c_ref in pairs(m_active) do
+				local key_type = '[' .. (c_ref.mode or '?') .. ']'
+		
+				renderer_text(x + 5, y + height_offset, 255, 255, 255, m_alpha*c_ref.alpha*255, '', 0, c_name)
+				renderer_text(x + w - renderer_measure_text(nil, key_type) - 5, y + height_offset, 255, 255, 255, m_alpha*c_ref.alpha*255, '', 0, key_type)
+		
+				height_offset = height_offset + 15
+			end
+		
+			dragging:drag(w, (3 + (15 * item_count(m_active))) * 2)
+
+			if master_switch and item_count(m_active) > 0 and latest_item then
+				m_alpha = m_alpha + frames
+
+				if m_alpha > 1 then 
+					m_alpha = 1
+				end
+			else
+				m_alpha = m_alpha - frames
+
+				if m_alpha < 0 then
+					m_alpha = 0
+				end 
+			end
+		
+			if is_menu_open then
+				m_active['Menu toggled'] = nil
+			end
+		end
+		
+		m_hotkeys_create = create_custom_item
+
+		client_set_event_callback('paint', g_paint_handler)
+	end,
+
+	antiaim = function()
+        local note = notes 'a_wbantiaim'
+        
+        local gram_fyaw = gram_create(0, 2)
+        local teleport_data = gram_create(0, 3)
+
+        local ind_phase, ind_num, ind_time = 0, 0, 0
+        local last_sent, current_choke = 0, 0
+        local teleport, last_origin = 0
+        local breaking_lc = 0
+
+        local g_setup_command = function(c)
+            local me = entity_get_local_player()
+        
+            if c.chokedcommands == 0 then
+                local m_origin = vector(entity_get_origin(me))
+        
+                if last_origin ~= nil then
+                    teleport = (m_origin-last_origin):length2dsqr()
+        
+                    gram_update(teleport_data, teleport, true)
+                end
+        
+                gram_update(gram_fyaw, math_abs(anti_aim.get_desync(1)), true)
+        
+                last_sent = current_choke
+                last_origin = m_origin
+            end
+        
+            breaking_lc = 
+                get_average(teleport_data) > 3200 and 1 or
+                    (anti_aim.get_tickbase_shifting() > 0 and 2 or 0)
+        
+            current_choke = c.chokedcommands
+        end
+
+        local g_paint_handler = function()
+            note.set_state(false)
+        
+            local me = entity_get_local_player()
+            
+            if me == nil or not entity_is_alive(me) then
+                return
+            end
+        
+            local state = ui_get(ms_antiaim)
+            local _, _, _, a = get_bar_color()
+        
+            note.set_state(state)
+            note.get(function(id)
+                local ms_clr = { ui_get(ms_color) }
+        
+                local addr, nval = '', false
+                local r, g, b = 150, 150, 150
+        
+                local fr = globals_frametime() * 3.75
+                local min_offset = 1200+math_max(0, get_average(teleport_data)-3800)
+                local teleport_mt = math_abs(math_min(teleport-3800, min_offset) / min_offset * 100)
+        
+                if ind_num ~= teleport_mt and ind_time < globals_realtime() then
+                    ind_time = globals_realtime() + 0.005
+                    ind_num = ind_num + (ind_num > teleport_mt and -1 or 1)
+                end
+        
+                ind_phase = ind_phase + (breaking_lc == 1 and fr or -fr)
+                ind_phase = ind_phase > 1 and 1 or ind_phase
+                ind_phase = ind_phase < 0 and 0 or ind_phase
+        
+                if breaking_lc == 2 then
+                    addr, ind_phase, ind_num = ' | SHIFTING', 0, 0
+                    r, g, b = 228, 126, 10
+                elseif ind_phase > 0.1 then
+                    addr = ' | dst: \x20\x20\x20\x20\x20\x20\x20\x20\x20'
+                end
+        
+                local text = ('FL: %s%s'):format(
+                    (function()
+                        if tonumber(last_sent) < 10 then
+                            return '\x20\x20' .. last_sent
+                        end
+
+                        return last_sent
+                    end)(),
+                addr)
+                
+                local h, w = 17, renderer_measure_text(nil, text) + 8
+                local x, y = client_screen_size(), 10 + (25*id)
+        
+                x = x - w - 10
+        
+                renderer_gradient(x, y + h, w/2, 1, 0, 0, 0, 25, r, g, b, 255, true)
+                renderer_gradient(x + w/2, y + h, w - w/2, 1, r, g, b, 255, 0, 0, 0, 25, true)
+        
+                renderer_rectangle(x, y, w, h, 17, 17, 17, a)
+                renderer_text(x+4, y + 2, 255, 255, 255, 255, '', 0, text)
+        
+                if ind_phase > 0 then
+                    renderer_gradient(
+                        x + w - renderer_measure_text(nil, ' | dst: ') + 2, 
+                        y + 6, math_min(100, ind_num) / 100 * 24, 5,
+        
+                        ms_clr[1], ms_clr[2], ms_clr[3], ind_phase*220,
+                        ms_clr[1], ms_clr[2], ms_clr[3], ind_phase * 25,
+        
+                        true
+                    )
+                end
+        
+                -- FAKE INDICATION
+                local lower_body = anti_aim.get_balance_adjust()
+                local r, g, b = get_color(math_abs(anti_aim.get_desync()), 30)
+        
+                local timer = (lower_body.next_update - globals_curtime()) / 1.1 * 1
+                local add_text = (lower_body.updating and timer >= 0) and '\x20\x20\x20\x20\x20' or ''
+        
+                local text = ('%sFAKE (%.1f°)'):format(add_text, get_average(gram_fyaw))
+                local h, w = 18, renderer_measure_text(nil, text) + 8
+        
+                -- INDICATIN GRADIENT
+                local dec = { r - (r/100 * 50), g - (g/100 * 50), b - (b/100 * 50) }
+        
+                renderer_gradient(x - w - 6, y, 2, h / 2, dec[1], dec[2], dec[3], 0, r, g, b, 255, false)
+                renderer_gradient(x - w - 6, y + h/2, 2, h / 2, r, g, b, 255, dec[1], dec[2], dec[3], 0, false)
+        
+                -- BACKGROUND GRADIENT
+                renderer_gradient(x - w - 4, y, w / 2, h, 17, 17, 17, 25,  17, 17, 17, a, true)
+                renderer_gradient(x - w - 4 + w / 2, y, w / 2, h, 17, 17, 17, a,  17, 17, 17, 25, true)
+                renderer_text(x - w, y + 2, 255, 255, 255, 255, '', 0, text)
+        
+                if lower_body.updating and timer >= 0 then
+                    renderer_circle_outline(x - w + 6, y + 8.5, 89, 119, 239, 255, 5, 0, timer, 2)
+                end
+            end)
+        end
+
+        client_set_event_callback('setup_command', g_setup_command)
+        client_set_event_callback('paint_ui', g_paint_handler)
+	end,
+
+    ilstate = function()
+		local note = notes 'a_winput'
+        local graphics = graphs()
+		
+        local formatting = (function(avg)
+            if avg < 1 then return ('%.2f'):format(avg) end
+            if avg < 10 then return ('%.1f'):format(avg) end
+            return ('%d'):format(avg)
+        end)
+
+        local jmp_ecx = client_find_signature('engine.dll', '\xFF\xE1')
+        local fnGetModuleHandle = ffi.cast('uint32_t(__fastcall*)(unsigned int, unsigned int, const char*)', jmp_ecx)
+        local fnGetProcAddress = ffi.cast('uint32_t(__fastcall*)(unsigned int, unsigned int, uint32_t, const char*)', jmp_ecx)
+        
+        local pGetProcAddress = ffi.cast('uint32_t**', ffi.cast('uint32_t', client_find_signature('engine.dll', '\xFF\x15\xCC\xCC\xCC\xCC\xA3\xCC\xCC\xCC\xCC\xEB\x05')) + 2)[0][0]
+        local pGetModuleHandle = ffi.cast('uint32_t**', ffi.cast('uint32_t', client_find_signature('engine.dll', '\xFF\x15\xCC\xCC\xCC\xCC\x85\xC0\x74\x0B')) + 2)[0][0]
+        local BindExports = function(sModuleName, sFunctionName, sTypeOf) local ctype = ffi.typeof(sTypeOf) return function(...) return ffi.cast(ctype, jmp_ecx)(fnGetProcAddress(pGetProcAddress, 0, fnGetModuleHandle(pGetModuleHandle, 0, sModuleName), sFunctionName), 0, ...) end end
+        
+        local fnEnumDisplaySettingsA = BindExports("user32.dll", "EnumDisplaySettingsA", "int(__fastcall*)(unsigned int, unsigned int, unsigned int, unsigned long, void*)");
+        local pLpDevMode = ffi.new("struct { char pad_0[120]; unsigned long dmDisplayFrequency; char pad_2[32]; }[1]")
+        
+        local gram_create = function(value, count) local gram = { }; for i=1, count do gram[i] = value; end return gram; end
+        local gram_update = function(tab, value, forced) local new_tab = tab; if forced or new_tab[#new_tab] ~= value then table_insert(new_tab, value); table_remove(new_tab, 1); end; tab = new_tab; end
+        local get_average = function(tab) local elements, sum = 0, 0; for k, v in pairs(tab) do sum = sum + v; elements = elements + 1; end return sum / elements; end
+        
+        local renderTime = client_timestamp()
+        local lag_data = gram_create(0, 90)
+        local fps_data = gram_create(0, 30)
+        local g_frameRate, g_prev_frameRate = 0, 0
+        
+        local post_render, pre_render = function()
+            renderTime = client_timestamp()
+        end, function()
+            gram_update(lag_data, client_timestamp() - renderTime)
+        end
+        
+        client_set_event_callback('post_render', post_render)
+        client_set_event_callback('pre_render', pre_render)
+
+        fnEnumDisplaySettingsA(0, 4294967295, pLpDevMode[0])
+
+		local g_paint_handler = function()
+            g_frameRate = 0.9 * g_frameRate + (1.0 - 0.9) * globals_absoluteframetime()
+            gram_update(fps_data, math_abs(g_prev_frameRate-(1/g_frameRate)), true)
+            g_prev_frameRate = 1/g_frameRate
+
+			local state = ui_get(ms_ieinfo)
+			local _, _, _, a = get_bar_color()
+
+            note.set_state(state)
+			note.get(function(id)
+                local avg = get_average(lag_data)
+                local display_frequency = tonumber(pLpDevMode[0].dmDisplayFrequency)
+				local text = ('%sms / 144hz'):format(formatting(avg), display_frequency)
+		
+                local interp = { get_color(15-avg, 15) }
+
+				local h, w = 18, renderer_measure_text(nil, text) + 8
+				local x, y = client_screen_size(), 10 + (25*id)
+		
+				x = x - w - 10
+
+                renderer_gradient(x, y+h, (w/2), 1, 0, 0, 0, 25, interp[1], interp[2], interp[3], 255, true)
+                renderer_gradient(x + w/2, y+h, w-w/2, 1, interp[1], interp[2], interp[3], 255, 0, 0, 0, 25, true)
+
+				renderer_rectangle(x, y, w, h, 17, 17, 17, a)
+				renderer_text(x+4, y + 2, 255, 255, 255, 255, '', 0, text)
+
+                local text = 'IO | '
+                local sub = text .. '\x20\x20\x20\x20\x20\x20\x20'
+                local h, w = 18, renderer_measure_text(nil, sub) + 8
+                local ie_w = renderer_measure_text(nil, text) + 4
+                local r, g, b = ui_get(ms_color)
+
+                local g_nValues_t = { 
+                    avg, 1, 3, 
+                    get_average(fps_data)/4, 0
+                }
+
+                local min_value, max_value = 
+                    math_min(unpack(g_nValues_t)), 
+                    math_max(unpack(g_nValues_t))
+
+                renderer_rectangle(x - w - 4, y, w, h, 17, 17, 17, a)
+                renderer_text(x - w, y + 2, 255, 255, 255, 255, '', 0, sub)
+
+                graphics:draw_histogram(g_nValues_t, 0, max_value, #g_nValues_t, {
+                    -- x, y, w, h
+                    x = x - w - 4 + ie_w,
+                    y = y + 4, 
+                    w = w - ie_w - 4,
+                    h = h - 8,
+            
+                    sDrawBar = "gradient_fadein", -- "none", "fill", "gradient_fadeout", "gradient_fadein"
+                    bDrawPeeks = false,
+                    thickness = 1,
+            
+                    clr_1 = { r, g, b, 255 },
+                    clr_2 = { 0, 127, 255, 255 },
+                }, false)
+			end)
+		end
+
+		client_set_event_callback('paint_ui', g_paint_handler)
+    end,
+
+	editor = function()
+		local data_editor = function()
+			local editor, editor_data, editor_cache, editor_callback = 
+				ui_new_checkbox(menu_tab[1], menu_tab[2], 'Idealyaw Data editor'), { }, { }, function() end
+			
+			for name, val in pairs(script_db) do
+				if name ~= 'keybinds' then
+					table_insert(editor_data, ui_new_label(menu_tab[1], menu_tab[2], name:upper()))
+	
+					for sname, sval in pairs(val) do
+						local sval_type = type(sval)
+
+						local _action = {
+							['string'] = function()
+								local _cfunction
+								local label, textbox = 
+									ui_new_label(menu_tab[1], menu_tab[2], ('	  > %s \n %s:%s'):format(sname, name, sname)), 
+									ui_new_textbox(menu_tab[1], menu_tab[2], ('%s:%s'):format(name, sname))
+	
+								ui_set(textbox, script_db[name][sname])
+	
+								_cfunction = function()
+									script_db[name][sname] = ui_get(textbox)
+									client_delay_call(0.01, function()
+										_cfunction()
+									end)
+								end
+	
+								_cfunction()
+	
+								return { label, textbox }
+							end,
+	
+							['boolean'] = function()
+								local checkbox = ui_new_checkbox(menu_tab[1], menu_tab[2], ('	  > %s \n %s:%s'):format(sname, name, sname))
+	
+								ui_set(checkbox, sval)
+								ui_set_callback(checkbox, function(c)
+									script_db[name][sname] = ui_get(c)
+								end)
+	
+								return { checkbox }
+							end,
+	
+							['table'] = function()
+								local slider = ui_new_slider(menu_tab[1], menu_tab[2], ('	  > %s \n %s:%s'):format(sname, name, sname), sval.min, sval.max, sval.init_val, true, nil, sval.scale)
+	
+								ui_set(slider, sval.value or sval.init_val)
+								ui_set_callback(slider, function(c)
+									script_db[name][sname].value = ui_get(c)
+								end)
+	
+								return { slider }
+							end
+						}
+	
+						if _action[sval_type] ~= nil then
+							for _, val in pairs(_action[sval_type]()) do
+								table_insert(editor_data, val)
+							end
+						end
+					end
+				end
+			end
+	
+			local pre_config_save = function()
+				ui_set(editor, false)
+	
+		
+				for _, ref in pairs(editor_data) do
+					editor_cache[ref] = ui_get(ref)
+				end
+			end
+		
+			local post_config_save = function()
+				ui_set(editor, false)
+				
+				for _, ref in pairs(editor_data) do
+					if editor_cache[ref] ~= nil then
+						ui_set(ref, editor_cache[ref])
+						editor_cache[ref] = nil
+					end
+				end
+			end
+		
+			client_set_event_callback('pre_config_save', function() pre_config_save() end)
+			client_set_event_callback('post_config_save', function() post_config_save() end)
+			client_set_event_callback('pre_config_load', function() pre_config_save() end)
+			client_set_event_callback('post_config_load', function() post_config_save() end)
+	
+			editor_callback = function()
+				local editor_active = ui_get(editor)
+		
+				for _, ref in pairs(editor_data) do
+					ui_set_visible(ref, editor_active)
+				end
+			end
+		
+			ui_set_callback(editor, editor_callback)
+			editor_callback()
+		end
+	
+		local keybind_editor = function()
+			local create_table = function(tbl)
+				local new_table = { }
+		
+				for k in pairs(tbl) do
+					table_insert(new_table, k)
+				end
+			
+				table_sort(new_table, function(a, b) 
+					return a:lower() < b:lower() 
+				end)
+		
+				local new_table2 = { 
+					'» Create new keybind'
+				}
+		
+				for i=1, #new_table do
+					table_insert(new_table2, new_table[i])
+				end
+		
+				return new_table2
+			end
+		
+			local generate_kb = function()
+				local new_table = { }
+				
+				for id, hotkey in pairs(script_db.keybinds) do
+					local custom_name = hotkey.custom_name
+					custom_name = (custom_name and #tostring(custom_name) > 0) and custom_name or nil
+	
+					new_table[custom_name or (hotkey.reference[3] or '?')] = {
+						hotkey_id = id,
+						reference = hotkey.reference,
+						custom_name = hotkey.custom_name,
+						ui_offset = hotkey.ui_offset,
+						require = hotkey.require
+					}
+				end
+	
+				return new_table
+			end
+			
+			local hk_callback, listbox_callback
+			local original_hk = {
+				reference = { '', '', '' },
+				custom_name = '',
+				ui_offset = 1,
+				require = ''
+			}
+	
+			local offset_type = {
+				'Basic',
+				'Extended'
+			}
+	
+			local new_hotkey = original_hk
+			
+			local hk_database = generate_kb()
+			local hk_list = create_table(hk_database)
+	
+			local hk_editor = ui_new_checkbox(menu_tab[1], menu_tab[2], 'Idealyaw Hotkey editor')
+			local listbox = ui_new_listbox(menu_tab[1], menu_tab[2], 'Idealyaw Keybinds', hk_list)
+		
+			local require = {
+				ui_new_checkbox(menu_tab[1], menu_tab[2], 'Custom hotkey'),
+		
+				ui_new_label(menu_tab[1], menu_tab[2], 'File name (without ".lua")'),
+				ui_new_textbox(menu_tab[1], menu_tab[2], 'idealyaw:keybinds:required_file')
+			}
+		
+			local custom_name = {
+				ui_new_checkbox(menu_tab[1], menu_tab[2], 'Custom name'),
+				ui_new_label(menu_tab[1], menu_tab[2], 'Original name'),
+				ui_new_textbox(menu_tab[1], menu_tab[2], 'idealyaw:keybinds:custom_name')
+			}
+	
+			local reference = {
+				ui_new_label(menu_tab[1], menu_tab[2], 'Reference'),
+				ui_new_textbox(menu_tab[1], menu_tab[2], 'idealyaw:keybinds:reference1'),
+				ui_new_textbox(menu_tab[1], menu_tab[2], 'idealyaw:keybinds:reference2'),
+				ui_new_textbox(menu_tab[1], menu_tab[2], 'idealyaw:keybinds:reference3')
+			}
+	
+			local ui_offset = {
+				ui_new_combobox(menu_tab[1], menu_tab[2], 'Hotkey type', offset_type),
+				ui_new_hotkey(menu_tab[1], menu_tab[3], ('Example: %s'):format(offset_type[1])),
+	
+				ui_new_checkbox(menu_tab[1], menu_tab[3], ('Example: %s'):format(offset_type[2])),
+				ui_new_hotkey(menu_tab[1], menu_tab[3], ' ', true),
+	
+				ui_new_combobox(menu_tab[1], menu_tab[3], ('Example: %s'):format(offset_type[2]), '-'),
+				ui_new_hotkey(menu_tab[1], menu_tab[3], ' ', true),
+			}
+	
+			local save_changes = ui_new_button(menu_tab[1], menu_tab[2], 'Save Changes', function()
+				local selected = hk_list[ui_get(listbox)+1] or hk_list[1]
+				local ui_offset = ui_get(ui_offset[1]) == offset_type[2] and 2 or 1
+	
+				local reference = { ui_get(reference[2]):lower(), ui_get(reference[3]):lower(), ui_get(reference[4]) }
+				local custom_name = ui_get(custom_name[1]) and ui_get(custom_name[3]) or ''
+	
+				if selected ~= hk_list[1] then
+					local cdata = hk_database[selected]
+	
+					if cdata ~= nil then
+						script_db.keybinds[cdata.hotkey_id] = {
+							ui_offset = ui_offset,
+							reference = reference,
+							require = ui_get(require[1]) and ui_get(require[3]):lower() or '',
+							custom_name = custom_name
+						}
+					end
+				else
+					local can_create, item = true, {
+						ui_offset = ui_offset,
+						reference = reference,
+						require = ui_get(require[1]) and ui_get(require[3]) or '',
+						custom_name = custom_name
+					}
+	
+					local item_ref = { 
+						item.reference[1]:lower(),
+						item.reference[2]:lower(),
+						item.reference[3]:lower()
+					}
+	
+					for id, val in pairs(script_db.keybinds) do
+						local val_ref = { 
+							val.reference[1]:lower(),
+							val.reference[2]:lower(),
+							val.reference[3]:lower()
+						}
+	
+						if val_ref[1] == item_ref[1] and val_ref[2] == item_ref[2] and val_ref[3] == item_ref[3] then
+							can_create = false
+							break
+						end
+					end
+	
+					if can_create and m_hotkeys_create(item) then
+						script_db.keybinds[#script_db.keybinds+1] = item
+	
+						client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+						client_color_log(255, 255, 255, 'Created hotkey \1\0')
+						client_color_log(155, 220, 220, ('[ %s ]'):format(table_concat(item.reference, ' > ')))
+					end
+	
+					if not can_create then
+						client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+						client_color_log(255, 255, 255, 'Could\'nt create hotkey \1\0')
+						client_color_log(155, 220, 220, '[ keybind already exists ]')
+						error()
+					end
+				end
+	
+				m_hotkeys_update = true
+	
+				hk_database = generate_kb()
+				hk_list = create_table(hk_database)
+	
+				ui_update(listbox, hk_list)
+				
+				listbox_callback(listbox)
+				hk_callback()
+			end)
+	
+			local delete_hk = ui_new_button(menu_tab[1], menu_tab[2], 'Delete Hotkey', function()
+				local selected = hk_list[ui_get(listbox)+1] or hk_list[1]
+	
+				if selected ~= hk_list[1] then
+					local cdata = hk_database[selected]
+	
+					script_db.keybinds[cdata.hotkey_id] = nil
+	
+					local new_db = { }
+	
+					for i=1, #script_db.keybinds do
+						if script_db.keybinds[i] ~= nil then
+							new_db[#new_db+1] = script_db.keybinds[i]
+						end
+					end
+	
+					script_db.keybinds = new_db
+	
+					client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+					client_color_log(255, 255, 255, 'Removed hotkey \1\0')
+					client_color_log(155, 220, 220, ('[ %s ]'):format(table_concat(cdata.reference, ' > ')))
+	
+					m_hotkeys_update = true
+	
+					hk_database = generate_kb()
+					hk_list = create_table(hk_database)
+		
+					ui_update(listbox, hk_list)
+					
+					listbox_callback(listbox)
+					hk_callback()
+					
+				end
+			end)
+		
+			hk_callback = function()
+				local active = ui_get(hk_editor)
+				local LBC = ui_get(listbox) == 0
+		
+				ui_set_visible(listbox, active)
+		
+				ui_set_visible(require[1], active and LBC)
+				ui_set_visible(require[2], active and ui_get(require[1]) and LBC)
+				ui_set_visible(require[3], active and ui_get(require[1]) and LBC)
+		
+				ui_set_visible(custom_name[1], active)
+				ui_set_visible(custom_name[2], active and ui_get(custom_name[1]) and not LBC)
+				ui_set_visible(custom_name[3], active and ui_get(custom_name[1]))
+	
+				ui_set_visible(reference[1], active)
+				ui_set_visible(reference[2], active and LBC)
+				ui_set_visible(reference[3], active and LBC)
+				ui_set_visible(reference[4], active and LBC)
+	
+				ui_set_visible(save_changes, active)
+				ui_set_visible(delete_hk, active and not LBC)
+	
+				for i=1, #ui_offset do
+					ui_set_visible(ui_offset[i], active and LBC)
+				end
+			end
+	
+			listbox_callback = function(c)
+				local local_bd = hk_database
+				local selected = hk_list[ui_get(c)+1] or hk_list[1]
+	
+				local cdata = local_bd[selected]
+	
+				if cdata == nil then
+					cdata = new_hotkey
+				end
+	
+				local ext_data = {
+					require = { #cdata.require > 0, cdata.require or '' },
+					custom_name = { cdata.custom_name ~= '', ('Original name: %s'):format(cdata.reference[3]), cdata.custom_name },
+	
+					reference = { 
+						('Reference: %s > %s (%d)'):format(cdata.reference[1], cdata.reference[2], cdata.ui_offset), 
+						cdata.reference[1], cdata.reference[2], cdata.reference[3]
+					},
+	
+					ui_offset = cdata.ui_offset
+				}
+	
+				ui_set(reference[1], selected ~= hk_list[1] and ext_data.reference[1] or 'Reference')
+	
+				ui_set(require[1], ext_data.require[1])
+				ui_set(require[3], ext_data.require[2])
+			
+				ui_set(custom_name[1], ext_data.custom_name[1])
+				ui_set(custom_name[2], ext_data.custom_name[2])
+				ui_set(custom_name[3], ext_data.custom_name[3])
+	
+				ui_set(reference[2], ext_data.reference[2])
+				ui_set(reference[3], ext_data.reference[3])
+				ui_set(reference[4], ext_data.reference[4])
+	
+				ui_set(ui_offset[1], offset_type[ext_data.ui_offset])
+	
+				hk_callback()
+			end
+	
+			client_set_event_callback('pre_config_save', function() ui_set(hk_editor, false) end)
+			client_set_event_callback('post_config_load', function() ui_set(hk_editor, false) end)
+	
+			ui_set_callback(hk_editor, hk_callback)
+			ui_set_callback(listbox, listbox_callback)
+			ui_set_callback(require[1], hk_callback)
+			ui_set_callback(custom_name[1], hk_callback)
+		
+			hk_callback()
+	
+			return hk_editor
+		end
+	
+		client_set_event_callback('console_input', function(e)
+			local e = e:gsub(' ', '')
+			local _action = {
+				['idealyaw:watermark:set_suffix'] = function()
+					script_db.watermark.suffix = ''
+					database_write(database_name, script_db)
+		
+					client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+					client_color_log(155, 220, 220, 'Suffix is now active')
+	
+					client_reload_active_scripts()
+				end,
+	
+				['idealyaw:watermark:unset_suffix'] = function()
+					script_db.watermark.suffix = nil
+					database_write(database_name, script_db)
+		
+					client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+					client_color_log(155, 220, 220, 'Suffix is now inactive')
+	
+					client_reload_active_scripts()
+				end,
+	
+				['idealyaw:reset'] = function()
+					for name in pairs(script_db) do
+						script_db[name] = name == 'keybinds' and script_db.keybinds or { }
+					end
+	
+					database_write(database_name, script_db)
+	
+					client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+					client_color_log(255, 0, 0, 'Wiping data sectors')
+	
+					client_reload_active_scripts()
+				end,
+	
+				['idealyaw:keybinds:reset'] = function()
+					script_db.keybinds = original_db.keybinds
+	
+					database_write(database_name, script_db)
+	
+					client_color_log(216, 181, 121, ('[%s] \1\0'):format(script_name))
+					client_color_log(255, 0, 0, 'Wiping keybinds sector')
+	
+					client_reload_active_scripts()
+				end
+			}
+	
+			if _action[e] ~= nil then
+				_action[e]()
+	
+				return true
+			end
+		end)
+	
+		data_editor()
+		keybind_editor()
+	end
+}
+
+ms_classes.watermark()
+ms_classes.spectators()
+ms_classes.keybinds()
+ms_classes.antiaim()
+ms_classes.ilstate()
+
+client_delay_call(0.1, ms_classes.editor)
+client_set_event_callback('shutdown', function()
+	database_write(database_name, script_db)
+end)
+
+local ms_fade_callback = function()
+	local active = ui_get(ms_palette)
+
+	ui_set_visible(ms_fade_offset, active ~= menu_palette[1] and active == menu_palette[2])
+	ui_set_visible(ms_fade_frequency, active ~= menu_palette[1] and active == menu_palette[3])
+	ui_set_visible(ms_fade_split_ratio, active ~= menu_palette[1])
+end
+
+ui_set_callback(ms_palette, ms_fade_callback)
+ms_fade_callback()

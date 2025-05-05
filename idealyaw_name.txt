@@ -1,0 +1,22 @@
+
+
+
+
+client.set_event_callback("paint_ui", function()
+    
+    local x_pos = 11  
+    local y_pos = 556 
+
+
+    local text_x = x_pos + 35 
+    
+    
+    local r, g, b, a = 255, 255, 255, 255  -- Белый цвет для "IDEALYAW"
+    local debug_r, debug_g, debug_b, debug_a = 195, 114, 114, 255  -- Цвет для "[DEBUG]"
+    local user_r, user_g, user_b, user_a = 255, 255, 255, 255  -- Белый цвет для "USER:M0R4N0"
+
+    
+    renderer.text(text_x, y_pos, r, g, b, a, "-", 0, "IDEALYAW")
+    renderer.text(text_x + 36, y_pos, debug_r, debug_g, debug_b, debug_a, "-", 0, "[DEBUG]")
+    renderer.text(text_x, y_pos + 14, user_r, user_g, user_b, user_a, "-", 0, "USER:M0R4N0")
+end)

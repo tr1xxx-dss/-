@@ -1,0 +1,66 @@
+-- Переменные
+local last_shot_data = {}
+local shot_counter = 0
+local last_dmg = 0
+local last_hc = 0
+local last_ratio = 0
+local last_id = 0
+
+-- Генерация значений с контролем разницы
+local function generate_values()
+    local dmg = math.random(40, 126)
+    local hc_min = dmg + 1
+    local hc_max = math.min(dmg + 50, 200)
+    local hc = math.random(hc_min, hc_max)
+    local ratio = (dmg / hc) * 100
+    return dmg, hc, ratio
+end
+
+-- aim_fire: сохраняем значения на выстрел
+client.set_event_callback("aim_fire", function(e)
+    if not e.target then return end
+
+    shot_counter = shot_counter + 1
+    local dmg, hc, ratio = generate_values()
+
+    last_shot_data[e.target] = {
+        dmg = dmg,
+        hc = hc,
+        ratio = ratio,
+        id = shot_counter
+    }
+end)
+
+-- player_hurt: при попадании обновляем финальные значения
+client.set_event_callback("player_hurt", function(e)
+    local lp = entity.get_local_player()
+    local attacker = client.userid_to_entindex(e.attacker)
+    local victim = client.userid_to_entindex(e.userid)
+
+    if attacker ~= lp then return end
+
+    local info = last_shot_data[victim] or {}
+    if (info.id or 0) > last_id then
+        last_dmg = info.dmg or 0
+        last_hc = info.hc or 0
+        last_ratio = info.ratio or 0
+        last_id = info.id
+    end
+end)
+
+-- paint_ui: отрисовка текста с RGB и возможностью менять размер
+client.set_event_callback("paint_ui", function()
+    local x = - 27
+    local y = 560
+    local textX = x + 35
+
+    -- Настройки для RGB и размера текста
+    local r, g, b = 255, 255, 255  -- Белый цвет, можно менять на любые RGB значения
+    local font_size = 799 -- Размер текста (можно изменять для увеличения или уменьшения)
+
+    -- Формируем строку для отображения данных
+    local text = string.format("%d / %d (%.1f)", last_dmg, last_hc, last_ratio)
+
+    -- Отрисовка текста с цветом и размером
+    renderer.text(textX, y + 28, r, g, b, 255, "b", font_size, text) 
+end)

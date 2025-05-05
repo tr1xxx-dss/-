@@ -1,0 +1,24 @@
+
+local images = require "gamesense/images"
+
+local svg_person = images.load_svg([[
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6" width="900" height="600"><rect fill="#fff" width="9" height="3"/><rect fill="#d52b1e" y="3" width="9" height="3"/><rect fill="#0039a6" y="2" width="9" height="2"/></svg>
+]])
+
+
+
+
+local cp_color  = ui.new_color_picker("LUA", "A", "Person Color", 255, 255, 255, 255)
+
+
+client.set_event_callback("paint_ui", function()
+
+    local r, g, b, a = 255, 255, 255, 255
+    local x = 11
+    local y = 556
+    local size = 23
+
+    if svg_person then
+        svg_person:draw(x, y, nil, size, r, g, b, a)
+    end
+end)

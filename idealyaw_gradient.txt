@@ -1,0 +1,21 @@
+local ui_new_checkbox = ui.new_checkbox
+local ui_new_slider = ui.new_slider
+local ui_new_color_picker = ui.new_color_picker
+local ui_get = ui.get
+local renderer_rectangle = renderer.rectangle
+
+
+client.set_event_callback("paint_ui", function()
+   
+
+    local r, g, b, a = 205, 123, 123, 255
+    local width = 113
+    local height = 32
+    local x0 = 7
+    local y0 = 552
+
+    for i = 0, width - 1 do
+        local alpha = a * (1 - i / width)
+        renderer_rectangle(x0 + i, y0, 1, height, r, g, b, alpha)
+    end
+end)

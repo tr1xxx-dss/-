@@ -1,0 +1,103 @@
+local slow, key = ui.reference("aa", "other", "slow motion")
+local limitfl = ui.reference("aa", "fake lag", "limit")
+
+local z = {}
+z.items = {
+    keys = {
+        dt = {ui.reference("rage", "aimbot", "double tap")},
+        mode = select(2, ui.reference("rage", "aimbot", "double tap")),
+        hs = {ui.reference("aa", "other", "on shot anti-aim")},
+        fd = {ui.reference("rage", "other", "duck peek assist")},
+        sp = {ui.reference("rage", "aimbot", "force safe point")},
+        fb = {ui.reference("rage", "aimbot", "force body aim")},
+    }
+}
+
+z.menu = {
+    ["Keybinds"] = {
+        left = ui.new_hotkey("aa", "anti-aimbot angles", "Left"),
+        right = ui.new_hotkey("aa", "anti-aimbot angles", "Right"),
+        forward = ui.new_hotkey("aa", "anti-aimbot angles", "Forward"),
+        fs = ui.new_hotkey("aa", "anti-aimbot angles", "Freestand")
+    },
+    ["Visuals"] = {
+        arrows = ui.new_checkbox("aa", "anti-aimbot angles", "Arrows"),
+        keys = ui.new_combobox("aa", "anti-aimbot angles", "\nArrows", {"b", " ", "+", "ts", "best"}),
+        keycolor = ui.new_color_picker("aa", "anti-aimbot angles", "Key Color", 55, 55, 55, 255),
+        colorkey = ui.new_color_picker("aa", "anti-aimbot angles", "Color Key", 179, 255, 18, 255)
+    }
+}
+
+z.cache = {
+    manual = {
+        aa = 0,
+        tick = 0
+    }
+}
+
+function z.indicator()
+    if not entity.is_alive(entity.get_local_player()) then return end
+    if not ui.get(z.menu["Visuals"].arrows) then return end
+
+    local w, h = client.screen_size()
+    w = w / 2
+    h = h / 2
+
+    local leftkey = "<"
+    local rightkey = ">"
+    local style = ui.get(z.menu["Visuals"].keys)
+
+    local r, g, b, a = ui.get(z.menu["Visuals"].keycolor)
+    local rr, gg, bb = ui.get(z.menu["Visuals"].colorkey)
+
+    if style == "ts" then
+        leftkey = "⯇"
+        rightkey = "⯈"
+        style = "+"
+        local yaw_body = math.max(-60, math.min(60, math.floor((entity.get_prop(entity.get_local_player(), "m_flPoseParameter", 11) or 0) * 120 - 60 + 0.5)))
+        renderer.line(w - 42, h-8, w - 42, h+8, rr, gg, bb, yaw_body > 0 and 55 or 255)
+        renderer.line(w + 42, h-8, w + 42, h+8, rr, gg, bb, yaw_body < 0 and 255 or 55)
+        h = h - 2.5
+    elseif style == "best" then
+        leftkey = "⮜"
+        rightkey = "⮞"
+        style = "b"
+    end
+
+    local manual = z.cache.manual.aa
+
+    if manual == -90 then
+        renderer.text(w - 50, h, rr, gg, bb, 255, "c" .. style, 0, leftkey)
+    else
+        renderer.text(w - 50, h, r, g, b, a, "c" .. style, 0, leftkey)
+    end
+
+    if manual == 90 then
+        renderer.text(w + 50, h, rr, gg, bb, 255, "c" .. style, 0, rightkey)
+    else
+        renderer.text(w + 50, h, r, g, b, a, "c" .. style, 0, rightkey)
+    end
+end
+
+client.set_event_callback("paint", z.indicator)
+
+client.set_event_callback("run_command", function()
+    local tick = globals.tickcount()
+
+    if ui.get(z.menu["Keybinds"].left) and z.cache.manual.tick < tick - 11 then
+        z.cache.manual.aa = (z.cache.manual.aa == -90) and 0 or -90
+        z.cache.manual.tick = tick
+    end
+
+    if ui.get(z.menu["Keybinds"].right) and z.cache.manual.tick < tick - 11 then
+        z.cache.manual.aa = (z.cache.manual.aa == 90) and 0 or 90
+        z.cache.manual.tick = tick
+    end
+
+    if ui.get(z.menu["Keybinds"].forward) and z.cache.manual.tick < tick - 11 then
+        z.cache.manual.aa = (z.cache.manual.aa == 180) and 0 or 180
+        z.cache.manual.tick = tick
+    end
+end)
+
+return z
